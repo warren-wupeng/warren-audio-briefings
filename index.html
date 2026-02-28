@@ -177,6 +177,18 @@ body{
 }
 
 .loading{text-align:center;padding:40px;color:rgba(255,255,255,.4);font-size:.85rem}
+
+/* Playing mode — collapse to show only 2 messages */
+.chat-area.playing-mode .msg{display:none}
+.chat-area.playing-mode .msg.vis{display:block}
+.chat-area.playing-mode .time-divider{display:none}
+.chat-area.playing-mode .time-divider.vis{display:block}
+.collapsed-hint{text-align:center;padding:6px 0}
+.collapsed-hint span{
+  font-size:.7rem;color:rgba(255,255,255,.35);
+  background:rgba(0,0,0,.25);backdrop-filter:blur(8px);
+  padding:3px 10px;border-radius:10px;
+}
 </style>
 </head>
 <body>
@@ -278,15 +290,42 @@ body{
 
   function render(){
     var html='',lastDate='',bars='';
+    var isPlaying=currentIdx>=0&&!audio.paused;
+
+    /* Which indices to show: current + 1 neighbor */
+    var showIdx={};
+    if(isPlaying){
+      showIdx[currentIdx]=true;
+      if(currentIdx+1<manifest.length)showIdx[currentIdx+1]=true;
+      else if(currentIdx-1>=0)showIdx[currentIdx-1]=true;
+    }
+    /* Which dates have visible messages */
+    var visDates={};
+    for(var k in showIdx){if(manifest[k])visDates[manifest[k].date||'']=true}
+
     for(var i=0;i<8;i++)bars+='<div class="bar"></div>';
+
+    var hiddenAbove=0,hintInserted=false;
 
     for(var i=0;i<manifest.length;i++){
       var a=manifest[i],ds=a.date||'',cat=a.category||'other',
           isP=i===currentIdx&&!audio.paused;
+      var show=!isPlaying||showIdx[i];
 
-      if(ds!==lastDate){html+='<div class="time-divider"><span>'+fmtDate(ds)+'</span></div>';lastDate=ds}
+      if(ds!==lastDate){
+        var dVis=!isPlaying||visDates[ds];
+        html+='<div class="time-divider'+(dVis?' vis':'')+'"><span>'+fmtDate(ds)+'</span></div>';
+        lastDate=ds;
+      }
 
-      html+='<div class="msg">'+
+      if(!show)hiddenAbove++;
+      /* Insert collapsed hint once, just before the first visible message */
+      if(show&&hiddenAbove>0&&!hintInserted){
+        html+='<div class="collapsed-hint vis"><span>'+hiddenAbove+' 条消息</span></div>';
+        hintInserted=true;
+      }
+
+      html+='<div class="msg'+(show?' vis':'')+'">'+
         '<div class="bubble">'+
           '<div class="audio-card" data-idx="'+i+'">'+
             '<div class="ac-header">'+
@@ -304,6 +343,9 @@ body{
         '</div>'+
       '</div>';
     }
+
+    if(isPlaying)chatArea.classList.add('playing-mode');
+    else chatArea.classList.remove('playing-mode');
     chatArea.innerHTML=html;
 
     chatArea.querySelectorAll('.audio-card,.ac-play').forEach(function(el){
