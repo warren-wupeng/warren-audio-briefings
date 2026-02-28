@@ -4,130 +4,263 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0f172a">
-<title>Warren Audio Briefings</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f8f5f1">
+<title>沈知意 | Zoey</title>
 <link rel="manifest" href="manifest.json">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   :root{
-    --bg:#0f172a;--surface:#1e293b;--surface2:#334155;
-    --text:#f8fafc;--text2:#94a3b8;--accent:#3b82f6;--accent2:#60a5fa;
-    --success:#22c55e;--radius:16px;
+    --bg:#f8f5f1;
+    --surface:#ffffff;
+    --surface2:#f0ebe4;
+    --text:#1a1a2e;
+    --text2:#6b7280;
+    --text3:#9ca3af;
+    --accent:#7c5ce7;
+    --accent-light:#a78bfa;
+    --accent-bg:rgba(124,92,231,.08);
+    --green:#10b981;
+    --green-bg:rgba(16,185,129,.08);
+    --orange:#f59e0b;
+    --orange-bg:rgba(245,158,11,.08);
+    --radius:20px;
+    --radius-sm:14px;
+    --shadow:0 2px 12px rgba(0,0,0,.06);
+    --shadow-lg:0 8px 30px rgba(0,0,0,.08);
   }
   body{
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;
     background:var(--bg);color:var(--text);
     min-height:100vh;min-height:100dvh;
     -webkit-tap-highlight-color:transparent;
     overflow-x:hidden;
+    line-height:1.6;
   }
-  .container{max-width:480px;margin:0 auto;padding:16px 16px 120px}
-  header{text-align:center;padding:24px 0 16px}
-  header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
-  header p{color:var(--text2);font-size:.85rem;margin-top:4px}
-  .tabs{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px}
+
+  /* Hero */
+  .hero{
+    text-align:center;
+    padding:40px 20px 24px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+    width:300px;height:300px;
+    background:radial-gradient(circle,rgba(124,92,231,.12) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .avatar-wrap{
+    width:120px;height:120px;margin:0 auto 16px;
+    border-radius:50%;overflow:hidden;
+    box-shadow:0 4px 20px rgba(124,92,231,.2);
+    border:3px solid var(--surface);
+    position:relative;
+  }
+  .avatar-wrap img{width:100%;height:100%;object-fit:cover}
+  .hero h1{
+    font-size:1.4rem;font-weight:700;
+    letter-spacing:.02em;margin-bottom:4px;
+  }
+  .hero .subtitle{
+    color:var(--text2);font-size:.85rem;
+    margin-bottom:12px;
+  }
+  .hero .bio{
+    color:var(--text2);font-size:.8rem;
+    max-width:300px;margin:0 auto;
+    line-height:1.5;
+  }
+  .hero .tag{
+    display:inline-block;
+    padding:4px 12px;border-radius:20px;
+    font-size:.75rem;font-weight:500;
+    background:var(--accent-bg);color:var(--accent);
+    margin-top:10px;
+  }
+
+  /* Container */
+  .container{max-width:480px;margin:0 auto;padding:0 16px 140px}
+
+  /* Tabs */
+  .tabs{
+    display:flex;gap:8px;margin-bottom:20px;
+    padding:0 4px;
+  }
   .tabs button{
-    flex-shrink:0;padding:8px 16px;border-radius:20px;border:none;
-    background:var(--surface);color:var(--text2);font-size:.85rem;cursor:pointer;
-    transition:all .2s;
+    flex:1;padding:10px 0;border-radius:12px;border:none;
+    background:var(--surface);color:var(--text2);
+    font-size:.85rem;font-weight:500;cursor:pointer;
+    transition:all .25s;box-shadow:var(--shadow);
   }
-  .tabs button.active{background:var(--accent);color:#fff}
+  .tabs button.active{
+    background:var(--accent);color:#fff;
+    box-shadow:0 4px 14px rgba(124,92,231,.3);
+  }
+
+  /* Section header */
+  .section-label{
+    font-size:.75rem;font-weight:600;color:var(--text3);
+    text-transform:uppercase;letter-spacing:.08em;
+    padding:16px 4px 10px;
+  }
+
+  /* Cards */
   .card{
-    background:var(--surface);border-radius:var(--radius);padding:16px;
-    margin-bottom:12px;cursor:pointer;transition:all .15s;
+    background:var(--surface);border-radius:var(--radius);
+    padding:18px;margin-bottom:10px;cursor:pointer;
+    transition:all .2s;box-shadow:var(--shadow);
     border:2px solid transparent;position:relative;
+    display:flex;align-items:center;gap:14px;
   }
-  .card:active{transform:scale(.98)}
-  .card.playing{border-color:var(--accent)}
-  .card .title{font-size:1rem;font-weight:600;margin-bottom:4px;line-height:1.4}
-  .card .meta{color:var(--text2);font-size:.8rem;display:flex;gap:12px;align-items:center}
-  .card .meta .dur{display:flex;align-items:center;gap:4px}
-  .card .badge{
-    display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;
-    font-weight:600;background:var(--accent);color:#fff;margin-left:8px;
+  .card:active{transform:scale(.985)}
+  .card.playing{
+    border-color:var(--accent);
+    box-shadow:0 4px 20px rgba(124,92,231,.15);
   }
-  .card .badge.interview{background:#8b5cf6}
-  .card .badge.briefing{background:var(--success)}
+  .card-icon{
+    flex-shrink:0;width:48px;height:48px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.2rem;
+  }
+  .card-icon.briefing{background:var(--green-bg);color:var(--green)}
+  .card-icon.interview{background:var(--accent-bg);color:var(--accent)}
+  .card-body{flex:1;min-width:0}
+  .card .title{
+    font-size:.95rem;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    margin-bottom:2px;
+  }
+  .card .meta{
+    color:var(--text3);font-size:.78rem;
+    display:flex;align-items:center;gap:8px;
+  }
+  .card .meta svg{flex-shrink:0}
+  .card .play-hint{
+    flex-shrink:0;width:36px;height:36px;
+    border-radius:50%;background:var(--accent-bg);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--accent);transition:all .2s;
+  }
+  .card.playing .play-hint{
+    background:var(--accent);color:#fff;
+  }
 
   /* Player bar */
   .player-bar{
     position:fixed;bottom:0;left:0;right:0;
-    background:var(--surface);border-top:1px solid var(--surface2);
-    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-    transform:translateY(100%);transition:transform .3s ease;
-    z-index:100;backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    background:rgba(30,41,59,.95);
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    border-top:1px solid rgba(0,0,0,.06);
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+    transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+    z-index:100;
   }
   .player-bar.visible{transform:translateY(0)}
-  .player-bar .now-playing{
-    font-size:.8rem;color:var(--text2);white-space:nowrap;
-    overflow:hidden;text-overflow:ellipsis;margin-bottom:8px;
-    text-align:center;
+
+  .player-info{
+    display:flex;align-items:center;gap:12px;margin-bottom:12px;
   }
+  .player-avatar{
+    width:40px;height:40px;border-radius:12px;overflow:hidden;flex-shrink:0;
+  }
+  .player-avatar img{width:100%;height:100%;object-fit:cover}
+  .player-title{
+    flex:1;min-width:0;
+  }
+  .player-title .now-playing{
+    font-size:.85rem;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .player-title .now-meta{
+    font-size:.72rem;color:var(--text3);
+  }
+
   .progress-wrap{
-    width:100%;height:28px;display:flex;align-items:center;
-    cursor:pointer;touch-action:none;margin-bottom:8px;
+    width:100%;height:24px;display:flex;align-items:center;
+    cursor:pointer;touch-action:none;margin-bottom:4px;
   }
   .progress-bg{
-    width:100%;height:4px;background:var(--surface2);border-radius:2px;
+    width:100%;height:3px;background:var(--surface2);border-radius:2px;
     position:relative;overflow:visible;
   }
   .progress-fill{
-    height:100%;background:var(--accent);border-radius:2px;
-    width:0%;position:relative;transition:none;
+    height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));
+    border-radius:2px;width:0%;position:relative;transition:none;
   }
   .progress-fill::after{
-    content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);
-    width:16px;height:16px;background:var(--accent2);border-radius:50%;
-    box-shadow:0 0 8px rgba(59,130,246,.5);
+    content:'';position:absolute;right:-7px;top:50%;transform:translateY(-50%);
+    width:14px;height:14px;background:var(--accent);border-radius:50%;
+    box-shadow:0 0 0 4px rgba(124,92,231,.15);
   }
-  .time-row{display:flex;justify-content:space-between;font-size:.75rem;color:var(--text2);margin-bottom:10px}
-  .controls{display:flex;align-items:center;justify-content:center;gap:20px}
+  .time-row{
+    display:flex;justify-content:space-between;
+    font-size:.7rem;color:var(--text3);margin-bottom:10px;
+  }
+
+  .controls{display:flex;align-items:center;justify-content:center;gap:16px}
   .ctrl-btn{
-    background:none;border:none;color:var(--text);cursor:pointer;
-    width:48px;height:48px;display:flex;align-items:center;justify-content:center;
-    border-radius:50%;transition:background .15s;font-size:1.2rem;
+    background:none;border:none;color:var(--text2);cursor:pointer;
+    width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;transition:all .15s;
   }
   .ctrl-btn:active{background:var(--surface2)}
   .ctrl-btn.play{
-    width:64px;height:64px;background:var(--accent);border-radius:50%;font-size:1.5rem;
+    width:56px;height:56px;
+    background:var(--accent);color:#fff;
+    border-radius:50%;
+    box-shadow:0 4px 14px rgba(124,92,231,.3);
   }
-  .ctrl-btn.play:active{background:var(--accent2)}
+  .ctrl-btn.play:active{background:var(--accent-light)}
+
   .speed-btn{
-    font-size:.8rem;font-weight:700;min-width:48px;
+    font-size:.78rem;font-weight:700;min-width:44px;
     padding:6px 10px;background:var(--surface2);border:none;
-    color:var(--text);border-radius:12px;cursor:pointer;
+    color:var(--text);border-radius:10px;cursor:pointer;
     text-align:center;
   }
-  .speed-btn:active{background:var(--accent)}
+  .speed-btn:active{background:var(--accent-bg);color:var(--accent)}
 
   /* Empty state */
-  .empty{text-align:center;padding:60px 20px;color:var(--text2)}
-  .empty svg{width:64px;height:64px;opacity:.3;margin-bottom:16px}
+  .empty{text-align:center;padding:48px 20px;color:var(--text3)}
 
   /* Loading */
-  .loading{text-align:center;padding:40px;color:var(--text2)}
+  .loading{text-align:center;padding:40px;color:var(--text3)}
   @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
   .loading span{animation:pulse 1.5s infinite}
 
-  /* Scroll to hide address bar */
-  @media(max-width:480px){.container{padding:12px 12px 120px}}
+  @media(max-width:480px){
+    .container{padding:0 12px 140px}
+    .hero{padding:32px 16px 20px}
+  }
 </style>
 </head>
 <body>
+
+<div class="hero">
+  <div class="avatar-wrap">
+    <img src="audio/zoey-avatar.png" alt="沈知意" />
+  </div>
+  <h1>沈知意</h1>
+  <div class="subtitle">Warren 的首席 AI 助理</div>
+  <div class="bio">每天为你整理工作进展、面试准备和团队动态</div>
+  <div class="tag">内容由 AI 生成</div>
+</div>
+
 <div class="container">
-  <header>
-    <h1>Warren Audio Briefings</h1>
-    <p id="subtitle">Loading...</p>
-  </header>
   <div class="tabs" id="tabs"></div>
-  <div id="list"><div class="loading"><span>Loading audio list...</span></div></div>
+  <div id="list"><div class="loading"><span>Loading...</span></div></div>
 </div>
 
 <div class="player-bar" id="playerBar">
-  <div class="now-playing" id="nowPlaying">--</div>
+  <div class="player-info">
+    <div class="player-avatar"><img src="audio/zoey-avatar.png" alt="" /></div>
+    <div class="player-title">
+      <div class="now-playing" id="nowPlaying">--</div>
+      <div class="now-meta" id="nowMeta">Zoey</div>
+    </div>
+  </div>
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-bg">
       <div class="progress-fill" id="progressFill"></div>
@@ -139,14 +272,14 @@
   </div>
   <div class="controls">
     <button class="ctrl-btn" id="btnBack" title="Back 15s">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">15</text></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">15</text></svg>
     </button>
     <button class="ctrl-btn play" id="btnPlay" title="Play">
-      <svg id="iconPlay" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
-      <svg id="iconPause" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+      <svg id="iconPlay" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>
+      <svg id="iconPause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
     </button>
     <button class="ctrl-btn" id="btnFwd" title="Forward 30s">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">30</text></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">30</text></svg>
     </button>
     <button class="speed-btn" id="btnSpeed">1.0x</button>
   </div>
@@ -156,18 +289,16 @@
 
 <script>
 (function(){
-  // --- Config ---
   const SPEEDS = [0.8, 1.0, 1.2, 1.5, 2.0];
   const AUDIO_BASE = 'audio/';
   const MANIFEST_URL = 'audio/manifest.json';
 
-  // --- DOM refs ---
   const audio = document.getElementById('audio');
   const list = document.getElementById('list');
   const tabs = document.getElementById('tabs');
-  const subtitle = document.getElementById('subtitle');
   const playerBar = document.getElementById('playerBar');
   const nowPlaying = document.getElementById('nowPlaying');
+  const nowMeta = document.getElementById('nowMeta');
   const progressFill = document.getElementById('progressFill');
   const progressWrap = document.getElementById('progressWrap');
   const timeCur = document.getElementById('timeCur');
@@ -183,43 +314,54 @@
   let categories = [];
   let currentCat = 'all';
   let currentIdx = -1;
-  let speedIdx = 1; // 1.0x default
+  let speedIdx = 1;
 
-  // --- Helpers ---
   function fmt(s){
     if(!s||isNaN(s))return '0:00';
     const m=Math.floor(s/60), sec=Math.floor(s%60);
     return m+':'+(sec<10?'0':'')+sec;
   }
 
-  // --- Fetch manifest ---
+  const catLabels = {
+    all:'全部',
+    briefing:'每日简报',
+    interview:'面试准备'
+  };
+
+  const catIcons = {
+    briefing: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    interview: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>'
+  };
+
   async function init(){
     try{
-      const r = await fetch(MANIFEST_URL);
+      const r = await fetch(MANIFEST_URL + '?t=' + Date.now());
       if(!r.ok) throw new Error('No manifest');
       manifest = await r.json();
     }catch(e){
-      // Fallback: scan known audio files
       manifest = [];
     }
     if(!manifest.length){
-      list.innerHTML='<div class="empty"><p>No audio files yet.</p><p style="margin-top:8px;font-size:.8rem">Add MP3 files to audio/ and update manifest.json</p></div>';
-      subtitle.textContent = 'No briefings available';
+      list.innerHTML='<div class="empty"><p>暂无音频内容</p></div>';
       return;
     }
-    // Extract categories
+    // Sort: briefings first (newest), then interview
+    manifest.sort((a,b) => {
+      if(a.category === 'briefing' && b.category !== 'briefing') return -1;
+      if(a.category !== 'briefing' && b.category === 'briefing') return 1;
+      if(a.date && b.date) return b.date.localeCompare(a.date);
+      return 0;
+    });
     const catSet = new Set();
-    manifest.forEach(a => (a.category||'Other') && catSet.add(a.category||'Other'));
+    manifest.forEach(a => catSet.add(a.category||'Other'));
     categories = ['all', ...catSet];
     renderTabs();
     renderList();
-    subtitle.textContent = manifest.length + ' audio files';
   }
 
   function renderTabs(){
-    const labels = {all:'All', briefing:'Briefings', interview:'Interview Prep'};
     tabs.innerHTML = categories.map(c =>
-      `<button class="${c===currentCat?'active':''}" data-cat="${c}">${labels[c]||c}</button>`
+      '<button class="'+(c===currentCat?'active':'')+'" data-cat="'+c+'">'+(catLabels[c]||c)+'</button>'
     ).join('');
     tabs.querySelectorAll('button').forEach(b => {
       b.onclick = () => {
@@ -234,22 +376,49 @@
     const items = currentCat==='all' ? manifest :
       manifest.filter(a => (a.category||'Other')===currentCat);
     if(!items.length){
-      list.innerHTML='<div class="empty"><p>No items in this category</p></div>';
+      list.innerHTML='<div class="empty"><p>该分类暂无内容</p></div>';
       return;
     }
-    list.innerHTML = items.map((a, i) => {
-      const idx = manifest.indexOf(a);
-      const cat = a.category||'Other';
-      const badgeClass = cat==='interview'?'interview': cat==='briefing'?'briefing':'';
-      return `<div class="card ${idx===currentIdx?'playing':''}" data-idx="${idx}">
-        <div class="title">${a.title}</div>
-        <div class="meta">
-          <span class="dur"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${a.duration||'--'}</span>
-          <span>${a.date||''}</span>
-          <span class="badge ${badgeClass}">${cat}</span>
-        </div>
-      </div>`;
-    }).join('');
+
+    // Group by category
+    const groups = {};
+    items.forEach(a => {
+      const cat = a.category || 'Other';
+      if(!groups[cat]) groups[cat] = [];
+      groups[cat].push(a);
+    });
+
+    let html = '';
+    const order = ['briefing', 'interview', 'Other'];
+    order.forEach(cat => {
+      if(!groups[cat]) return;
+      if(currentCat === 'all' && Object.keys(groups).length > 1){
+        html += '<div class="section-label">'+(catLabels[cat]||cat)+'</div>';
+      }
+      groups[cat].forEach(a => {
+        const idx = manifest.indexOf(a);
+        const cat = a.category||'Other';
+        const icon = catIcons[cat] || catIcons.briefing;
+        html += '<div class="card '+(idx===currentIdx?'playing':'')+'" data-idx="'+idx+'">' +
+          '<div class="card-icon '+cat+'">'+icon+'</div>' +
+          '<div class="card-body">' +
+            '<div class="title">'+a.title+'</div>' +
+            '<div class="meta">' +
+              '<span>'+(a.date||'')+'</span>' +
+              (a.duration && a.duration!=='--' ? '<span>'+a.duration+'</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="play-hint">' +
+            (idx===currentIdx && !audio.paused ?
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>' :
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>'
+            ) +
+          '</div>' +
+        '</div>';
+      });
+    });
+
+    list.innerHTML = html;
     list.querySelectorAll('.card').forEach(card => {
       card.onclick = () => play(parseInt(card.dataset.idx));
     });
@@ -263,11 +432,11 @@
     audio.playbackRate = SPEEDS[speedIdx];
     audio.play().catch(()=>{});
     nowPlaying.textContent = a.title;
+    nowMeta.textContent = (a.date||'') + ' · Zoey';
     playerBar.classList.add('visible');
     renderList();
   }
 
-  // --- Player controls ---
   btnPlay.onclick = () => {
     if(!audio.src) return;
     if(audio.paused) audio.play().catch(()=>{});
@@ -281,8 +450,14 @@
     btnSpeed.textContent = SPEEDS[speedIdx] + 'x';
   };
 
-  audio.addEventListener('play', () => { iconPlay.style.display='none'; iconPause.style.display=''; });
-  audio.addEventListener('pause', () => { iconPlay.style.display=''; iconPause.style.display='none'; });
+  audio.addEventListener('play', () => {
+    iconPlay.style.display='none'; iconPause.style.display='';
+    renderList();
+  });
+  audio.addEventListener('pause', () => {
+    iconPlay.style.display=''; iconPause.style.display='none';
+    renderList();
+  });
   audio.addEventListener('timeupdate', () => {
     if(!audio.duration) return;
     const pct = (audio.currentTime / audio.duration) * 100;
@@ -291,11 +466,9 @@
     timeTotal.textContent = fmt(audio.duration);
   });
   audio.addEventListener('ended', () => {
-    // Auto-play next
     if(currentIdx < manifest.length - 1) play(currentIdx + 1);
   });
 
-  // --- Progress bar seek ---
   function seekFromEvent(e){
     const rect = progressWrap.getBoundingClientRect();
     const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
@@ -308,15 +481,14 @@
   document.addEventListener('touchmove', (e) => { if(dragging) seekFromEvent(e); }, {passive:true});
   document.addEventListener('touchend', () => { dragging = false; });
 
-  // --- Media session API for lock screen controls ---
   if('mediaSession' in navigator){
     audio.addEventListener('play', () => {
       const a = manifest[currentIdx];
       if(!a) return;
       navigator.mediaSession.metadata = new MediaMetadata({
         title: a.title,
-        artist: 'Warren Audio Briefings',
-        album: a.category || 'Briefing',
+        artist: '沈知意 | Zoey',
+        album: catLabels[a.category] || 'Audio',
       });
     });
     navigator.mediaSession.setActionHandler('play', () => audio.play());
@@ -327,7 +499,6 @@
     navigator.mediaSession.setActionHandler('nexttrack', () => { if(currentIdx<manifest.length-1) play(currentIdx+1); });
   }
 
-  // --- Init ---
   init();
 })();
 </script>
