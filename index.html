@@ -5,197 +5,211 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#ededed">
+<meta name="theme-color" content="#000">
 <title>沈知意 | Zoey</title>
 <link rel="manifest" href="manifest.json">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  :root{
-    --wc-bg:#ededed;
-    --wc-bubble:#fff;
-    --wc-text:#111;
-    --wc-text2:#888;
-    --wc-time:#b0b0b0;
-    --wc-green:#07c160;
-    --wc-shadow:0 1px 2px rgba(0,0,0,.06);
-  }
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue','Microsoft YaHei',sans-serif;
-    background:var(--wc-bg);color:var(--wc-text);
-    min-height:100vh;min-height:100dvh;
-    -webkit-tap-highlight-color:transparent;
-    overflow-x:hidden;
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue','Microsoft YaHei',sans-serif;
+  background:#000;color:#fff;
+  min-height:100vh;min-height:100dvh;
+  -webkit-tap-highlight-color:transparent;
+  overflow-x:hidden;
+}
 
-  .wc-header{
-    position:fixed;top:0;left:0;right:0;z-index:200;
-    background:rgba(237,237,237,.92);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border-bottom:1px solid rgba(0,0,0,.08);
-    padding:env(safe-area-inset-top) 0 0;
-  }
-  .wc-header-inner{
-    max-width:480px;margin:0 auto;
-    display:flex;align-items:center;justify-content:center;
-    height:48px;position:relative;padding:0 16px;
-  }
-  .wc-header-title{font-size:1.05rem;font-weight:600}
-  .wc-header-sub{
-    position:absolute;right:16px;top:50%;transform:translateY(-50%);
-    font-size:.7rem;color:var(--wc-text2);
-  }
+/* Full-screen background photo */
+.bg-photo{
+  position:fixed;top:0;left:0;right:0;
+  height:100vh;height:100dvh;
+  background-size:cover;background-position:center top;
+  z-index:0;
+}
+.bg-photo::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;
+  height:55%;
+  background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.5) 40%,transparent 100%);
+}
 
-  .chat-bg{
-    position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;
-    background-size:cover;background-position:center top;
-    opacity:.12;transition:opacity .8s;
-  }
+/* Header — transparent, over photo */
+.header{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:env(safe-area-inset-top) 0 0;
+}
+.header-inner{
+  max-width:480px;margin:0 auto;
+  display:flex;align-items:center;gap:10px;
+  height:52px;padding:0 16px;
+}
+.header-avatar{
+  width:36px;height:36px;border-radius:50%;overflow:hidden;
+  border:2px solid rgba(255,255,255,.3);flex-shrink:0;
+}
+.header-avatar img{width:100%;height:100%;object-fit:cover}
+.header-info{flex:1}
+.header-name{font-size:1rem;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.header-tag{font-size:.68rem;color:rgba(255,255,255,.6)}
 
-  .chat-area{
-    max-width:480px;margin:0 auto;
-    padding:calc(56px + env(safe-area-inset-top)) 12px 160px;
-    position:relative;z-index:1;
-  }
+/* Scroll container — messages in lower portion */
+.scroll-wrap{
+  position:relative;z-index:1;
+  min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+}
 
-  .time-divider{text-align:center;padding:14px 0 8px}
-  .time-divider span{
-    display:inline-block;padding:3px 10px;border-radius:4px;
-    background:rgba(0,0,0,.06);font-size:.72rem;color:var(--wc-time);
-  }
+/* Spacer pushes messages to bottom half */
+.photo-spacer{
+  flex-shrink:0;
+  height:48vh;
+  pointer-events:none;
+}
 
-  .msg-row{display:flex;gap:8px;margin-bottom:12px;align-items:flex-start}
-  .msg-avatar{
-    flex-shrink:0;width:40px;height:40px;
-    border-radius:6px;overflow:hidden;box-shadow:var(--wc-shadow);
-  }
-  .msg-avatar img{width:100%;height:100%;object-fit:cover}
+.chat-area{
+  max-width:480px;width:100%;margin:0 auto;
+  padding:0 14px 150px;
+}
 
-  .bubble{
-    position:relative;max-width:calc(100% - 70px);
-    padding:10px 14px;border-radius:6px;
-    background:var(--wc-bubble);box-shadow:var(--wc-shadow);
-    font-size:.9rem;line-height:1.55;word-break:break-word;
-  }
-  .bubble::before{
-    content:'';position:absolute;top:12px;left:-6px;
-    width:0;height:0;
-    border-top:6px solid transparent;
-    border-bottom:6px solid transparent;
-    border-right:6px solid var(--wc-bubble);
-  }
+/* Time divider */
+.time-divider{text-align:center;padding:12px 0 8px}
+.time-divider span{
+  display:inline-block;padding:3px 10px;border-radius:4px;
+  background:rgba(0,0,0,.3);backdrop-filter:blur(8px);
+  font-size:.7rem;color:rgba(255,255,255,.6);
+}
 
-  .audio-card{cursor:pointer;transition:all .15s;min-width:200px}
-  .audio-card:active{opacity:.7}
+/* Message bubble — no avatar */
+.msg{margin-bottom:10px}
+.bubble{
+  display:inline-block;max-width:88%;
+  padding:10px 14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.08);
+  font-size:.88rem;line-height:1.55;color:rgba(255,255,255,.92);
+  word-break:break-word;
+}
 
-  .audio-card-header{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-  .audio-play-btn{
-    flex-shrink:0;width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    background:var(--wc-green);color:#fff;
-    box-shadow:0 2px 8px rgba(7,193,96,.3);transition:all .15s;
-  }
-  .audio-play-btn:active{transform:scale(.9)}
-  .audio-play-btn.playing{animation:pulse-g 1.5s infinite}
-  @keyframes pulse-g{
-    0%,100%{box-shadow:0 2px 8px rgba(7,193,96,.3)}
-    50%{box-shadow:0 2px 16px rgba(7,193,96,.5)}
-  }
+/* Audio card */
+.audio-card{cursor:pointer;transition:all .15s;min-width:210px}
+.audio-card:active{opacity:.7}
 
-  .audio-card-info{flex:1;min-width:0}
-  .audio-card-title{
-    font-size:.88rem;font-weight:500;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .audio-card-meta{font-size:.72rem;color:var(--wc-text2);margin-top:1px}
+.ac-header{display:flex;align-items:center;gap:10px}
+.ac-play{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.2);color:#fff;
+  transition:all .15s;
+}
+.ac-play:active{transform:scale(.9)}
+.ac-play.playing{
+  background:rgba(255,255,255,.35);
+  animation:glow 1.5s infinite;
+}
+@keyframes glow{
+  0%,100%{box-shadow:0 0 8px rgba(255,255,255,.1)}
+  50%{box-shadow:0 0 16px rgba(255,255,255,.3)}
+}
 
-  .audio-wave{display:flex;align-items:center;gap:2px;height:20px;margin-top:4px}
-  .audio-wave .bar{width:3px;border-radius:2px;background:var(--wc-green);opacity:.25;height:4px}
-  .audio-wave.active .bar{animation:wave .6s ease-in-out infinite alternate;opacity:1}
-  .audio-wave.active .bar:nth-child(1){animation-delay:0s;height:8px}
-  .audio-wave.active .bar:nth-child(2){animation-delay:.1s;height:14px}
-  .audio-wave.active .bar:nth-child(3){animation-delay:.2s;height:10px}
-  .audio-wave.active .bar:nth-child(4){animation-delay:.15s;height:18px}
-  .audio-wave.active .bar:nth-child(5){animation-delay:.25s;height:12px}
-  .audio-wave.active .bar:nth-child(6){animation-delay:.05s;height:16px}
-  .audio-wave.active .bar:nth-child(7){animation-delay:.2s;height:8px}
-  .audio-wave.active .bar:nth-child(8){animation-delay:.1s;height:14px}
-  @keyframes wave{0%{height:4px}100%{height:20px}}
+.ac-info{flex:1;min-width:0}
+.ac-title{
+  font-size:.88rem;font-weight:500;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ac-meta{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:1px}
 
-  .player-bar{
-    position:fixed;bottom:0;left:0;right:0;z-index:100;
-    background:rgba(247,247,247,.95);
-    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-    border-top:1px solid rgba(0,0,0,.08);
-    padding:10px 16px calc(10px + env(safe-area-inset-bottom));
-    transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
-  }
-  .player-bar.visible{transform:translateY(0)}
+.ac-wave{display:flex;align-items:center;gap:2px;height:18px;margin-top:6px}
+.ac-wave .bar{width:2.5px;border-radius:2px;background:rgba(255,255,255,.2);height:4px}
+.ac-wave.active .bar{animation:wave .6s ease-in-out infinite alternate;background:rgba(255,255,255,.7)}
+.ac-wave.active .bar:nth-child(1){animation-delay:0s}
+.ac-wave.active .bar:nth-child(2){animation-delay:.08s}
+.ac-wave.active .bar:nth-child(3){animation-delay:.16s}
+.ac-wave.active .bar:nth-child(4){animation-delay:.12s}
+.ac-wave.active .bar:nth-child(5){animation-delay:.2s}
+.ac-wave.active .bar:nth-child(6){animation-delay:.04s}
+.ac-wave.active .bar:nth-child(7){animation-delay:.18s}
+.ac-wave.active .bar:nth-child(8){animation-delay:.1s}
+@keyframes wave{0%{height:4px}100%{height:18px}}
 
-  .player-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .player-avatar{width:36px;height:36px;border-radius:6px;overflow:hidden;flex-shrink:0}
-  .player-avatar img{width:100%;height:100%;object-fit:cover}
-  .player-info{flex:1;min-width:0}
-  .player-info .title{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .player-info .meta{font-size:.7rem;color:var(--wc-text2)}
+/* Player bar */
+.player-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(20,20,20,.85);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,.06);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.player-bar.visible{transform:translateY(0)}
 
-  .progress-wrap{width:100%;height:24px;display:flex;align-items:center;cursor:pointer;touch-action:none}
-  .progress-bg{width:100%;height:3px;background:rgba(0,0,0,.1);border-radius:2px;position:relative;overflow:visible}
-  .progress-fill{height:100%;background:var(--wc-green);border-radius:2px;width:0%;position:relative;transition:none}
-  .progress-fill::after{
-    content:'';position:absolute;right:-6px;top:50%;transform:translateY(-50%);
-    width:12px;height:12px;background:var(--wc-green);border-radius:50%;
-    box-shadow:0 0 0 3px rgba(7,193,96,.15);
-  }
-  .time-row{display:flex;justify-content:space-between;font-size:.68rem;color:var(--wc-text2);margin:2px 0 8px}
+.p-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.p-avatar{width:34px;height:34px;border-radius:8px;overflow:hidden;flex-shrink:0}
+.p-avatar img{width:100%;height:100%;object-fit:cover}
+.p-info{flex:1;min-width:0}
+.p-info .t{font-size:.8rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-info .m{font-size:.68rem;color:rgba(255,255,255,.4)}
 
-  .controls{display:flex;align-items:center;justify-content:center;gap:14px}
-  .ctrl-btn{
-    background:none;border:none;color:#555;cursor:pointer;
-    width:40px;height:40px;display:flex;align-items:center;justify-content:center;
-    border-radius:50%;transition:all .15s;
-  }
-  .ctrl-btn:active{background:rgba(0,0,0,.06)}
-  .ctrl-btn.play{
-    width:48px;height:48px;background:var(--wc-green);color:#fff;border-radius:50%;
-    box-shadow:0 2px 10px rgba(7,193,96,.3);
-  }
-  .ctrl-btn.play:active{background:#06a850}
-  .speed-btn{
-    font-size:.76rem;font-weight:700;min-width:40px;
-    padding:5px 8px;background:rgba(0,0,0,.06);border:none;
-    color:var(--wc-text);border-radius:8px;cursor:pointer;
-  }
+.prog-wrap{width:100%;height:24px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+.prog-bg{width:100%;height:2.5px;background:rgba(255,255,255,.12);border-radius:2px;position:relative}
+.prog-fill{height:100%;background:#fff;border-radius:2px;width:0%;position:relative;transition:none}
+.prog-fill::after{
+  content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%);
+  width:10px;height:10px;background:#fff;border-radius:50%;
+}
+.time-row{display:flex;justify-content:space-between;font-size:.66rem;color:rgba(255,255,255,.35);margin:2px 0 8px}
 
-  .loading{text-align:center;padding:40px;color:var(--wc-text2);font-size:.85rem}
+.controls{display:flex;align-items:center;justify-content:center;gap:14px}
+.ctrl-btn{
+  background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;
+  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:all .15s;
+}
+.ctrl-btn:active{background:rgba(255,255,255,.1)}
+.ctrl-btn.play{
+  width:48px;height:48px;background:#fff;color:#000;border-radius:50%;
+}
+.ctrl-btn.play:active{background:rgba(255,255,255,.8)}
+.speed-btn{
+  font-size:.74rem;font-weight:700;min-width:40px;
+  padding:5px 8px;background:rgba(255,255,255,.1);border:none;
+  color:rgba(255,255,255,.7);border-radius:8px;cursor:pointer;
+}
 
-  @media(max-width:480px){.chat-area{padding-left:10px;padding-right:10px}}
+.loading{text-align:center;padding:40px;color:rgba(255,255,255,.4);font-size:.85rem}
 </style>
 </head>
 <body>
 
-<div class="chat-bg" id="chatBg"></div>
+<div class="bg-photo" id="bgPhoto"></div>
 
-<div class="wc-header">
-  <div class="wc-header-inner">
-    <span class="wc-header-title">沈知意</span>
-    <span class="wc-header-sub" id="headerSub"></span>
+<div class="header">
+  <div class="header-inner">
+    <div class="header-avatar"><img src="audio/zoey-avatar.jpg" alt="知意" /></div>
+    <div class="header-info">
+      <div class="header-name">沈知意</div>
+      <div class="header-tag">内容由 AI 生成</div>
+    </div>
   </div>
 </div>
 
-<div class="chat-area" id="chatArea">
-  <div class="loading">loading...</div>
+<div class="scroll-wrap">
+  <div class="photo-spacer"></div>
+  <div class="chat-area" id="chatArea">
+    <div class="loading">loading...</div>
+  </div>
 </div>
 
 <div class="player-bar" id="playerBar">
-  <div class="player-top">
-    <div class="player-avatar"><img src="audio/zoey-avatar.jpg" alt="" /></div>
-    <div class="player-info">
-      <div class="title" id="nowPlaying">--</div>
-      <div class="meta" id="nowMeta">知意</div>
+  <div class="p-top">
+    <div class="p-avatar"><img src="audio/zoey-avatar.jpg" alt="" /></div>
+    <div class="p-info">
+      <div class="t" id="nowPlaying">--</div>
+      <div class="m" id="nowMeta">知意</div>
     </div>
   </div>
-  <div class="progress-wrap" id="progressWrap">
-    <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="prog-wrap" id="progressWrap">
+    <div class="prog-bg"><div class="prog-fill" id="progressFill"></div></div>
   </div>
   <div class="time-row"><span id="timeCur">0:00</span><span id="timeTotal">0:00</span></div>
   <div class="controls">
@@ -203,8 +217,8 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">15</text></svg>
     </button>
     <button class="ctrl-btn play" id="btnPlay">
-      <svg id="iconPlay" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>
-      <svg id="iconPause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+      <svg id="iconPlay" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>
+      <svg id="iconPause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
     </button>
     <button class="ctrl-btn" id="btnFwd">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">30</text></svg>
@@ -221,12 +235,9 @@
       AVATAR='audio/zoey-avatar.jpg',
       BGS=['audio/bg-cafe.jpg','audio/bg-garden.jpg','audio/bg-night.jpg','audio/bg-sunrise.jpg'];
 
-  // Random background: changes by date + time-of-day
   var d=new Date(),seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate(),
       shift=Math.floor(d.getHours()/6),idx=(seed+shift)%BGS.length;
-  document.getElementById('chatBg').style.backgroundImage='url('+BGS[idx]+')';
-  document.getElementById('headerSub').textContent=
-    (d.getMonth()+1)+'/'+ d.getDate()+' '+ ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+  document.getElementById('bgPhoto').style.backgroundImage='url('+BGS[idx]+')';
 
   var audio=document.getElementById('audio'),
       chatArea=document.getElementById('chatArea'),
@@ -245,13 +256,11 @@
       btnSpeed=document.getElementById('btnSpeed');
 
   var manifest=[],currentIdx=-1,speedIdx=1;
-
-  function fmt(s){if(!s||isNaN(s))return '0:00';var m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec}
+  function fmt(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec}
   var catLabel={briefing:'每日简报',interview:'面试准备'};
 
   function fmtDate(ds){
-    if(!ds)return '';
-    var p=ds.split('-');return parseInt(p[1])+'月'+parseInt(p[2])+'日';
+    if(!ds)return'';var p=ds.split('-');return parseInt(p[1])+'月'+parseInt(p[2])+'日';
   }
 
   function init(){
@@ -259,7 +268,7 @@
       manifest=data;
       manifest.sort(function(a,b){
         if(a.date&&b.date){var c=a.date.localeCompare(b.date);if(c)return c}
-        if(a.category==='briefing'&&b.category!=='briefing')return -1;
+        if(a.category==='briefing'&&b.category!=='briefing')return-1;
         if(a.category!=='briefing'&&b.category==='briefing')return 1;
         return 0;
       });
@@ -268,10 +277,8 @@
   }
 
   function render(){
-    var html='',lastDate='',waveBars='';
-    for(var i=0;i<8;i++)waveBars+='<div class="bar"></div>';
-
-    html+='<div class="time-divider"><span>知意的语音频道</span></div>';
+    var html='',lastDate='',bars='';
+    for(var i=0;i<8;i++)bars+='<div class="bar"></div>';
 
     for(var i=0;i<manifest.length;i++){
       var a=manifest[i],ds=a.date||'',cat=a.category||'other',
@@ -279,35 +286,27 @@
 
       if(ds!==lastDate){html+='<div class="time-divider"><span>'+fmtDate(ds)+'</span></div>';lastDate=ds}
 
-      html+='<div class="msg-row">'+
-        '<div class="msg-avatar"><img src="'+AVATAR+'" /></div>'+
+      html+='<div class="msg">'+
         '<div class="bubble">'+
           '<div class="audio-card" data-idx="'+i+'">'+
-            '<div class="audio-card-header">'+
-              '<button class="audio-play-btn'+(isP?' playing':'')+'" data-idx="'+i+'">'+
+            '<div class="ac-header">'+
+              '<button class="ac-play'+(isP?' playing':'')+'" data-idx="'+i+'">'+
                 (isP?'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>':
                      '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>')+
               '</button>'+
-              '<div class="audio-card-info">'+
-                '<div class="audio-card-title">'+a.title+'</div>'+
-                '<div class="audio-card-meta">'+(catLabel[cat]||cat)+'</div>'+
+              '<div class="ac-info">'+
+                '<div class="ac-title">'+a.title+'</div>'+
+                '<div class="ac-meta">'+(catLabel[cat]||cat)+'</div>'+
               '</div>'+
             '</div>'+
-            '<div class="audio-wave'+(isP?' active':'')+'">'+waveBars+'</div>'+
+            '<div class="ac-wave'+(isP?' active':'')+'">'+bars+'</div>'+
           '</div>'+
         '</div>'+
       '</div>';
     }
     chatArea.innerHTML=html;
 
-    chatArea.querySelectorAll('.audio-card').forEach(function(el){
-      el.onclick=function(e){
-        e.stopPropagation();
-        var n=parseInt(el.dataset.idx);
-        if(n===currentIdx&&!audio.paused)audio.pause();else play(n);
-      };
-    });
-    chatArea.querySelectorAll('.audio-play-btn').forEach(function(el){
+    chatArea.querySelectorAll('.audio-card,.ac-play').forEach(function(el){
       el.onclick=function(e){
         e.stopPropagation();
         var n=parseInt(el.dataset.idx);
@@ -324,7 +323,6 @@
     nowPlaying.textContent=a.title;
     nowMeta.textContent=fmtDate(a.date)+' · 知意';
     playerBar.classList.add('visible');render();
-    // Scroll the playing card into view
     var card=chatArea.querySelector('.audio-card[data-idx="'+n+'"]');
     if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
   }
