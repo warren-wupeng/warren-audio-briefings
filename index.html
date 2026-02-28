@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#000">
-<title>沈知意 | Zoey</title>
+<title>ZoeyTalk</title>
 <link rel="manifest" href="manifest.json">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -31,7 +31,7 @@ body{
   background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.5) 40%,transparent 100%);
 }
 
-/* Header — transparent, over photo */
+/* Header */
 .header{
   position:fixed;top:0;left:0;right:0;z-index:200;
   padding:env(safe-area-inset-top) 0 0;
@@ -50,24 +50,19 @@ body{
 .header-name{font-size:1rem;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
 .header-tag{font-size:.68rem;color:rgba(255,255,255,.6)}
 
-/* Scroll container — messages in lower portion */
+/* Scroll container */
 .scroll-wrap{
   position:relative;z-index:1;
   min-height:100vh;min-height:100dvh;
   display:flex;flex-direction:column;
   justify-content:flex-end;
 }
-
-/* Spacer pushes messages to bottom half */
 .photo-spacer{
-  flex-shrink:0;
-  height:48vh;
-  pointer-events:none;
+  flex-shrink:0;height:48vh;pointer-events:none;
 }
-
 .chat-area{
   max-width:480px;width:100%;margin:0 auto;
-  padding:0 14px 150px;
+  padding:0 14px calc(40px + env(safe-area-inset-bottom));
 }
 
 /* Time divider */
@@ -78,7 +73,7 @@ body{
   font-size:.7rem;color:rgba(255,255,255,.6);
 }
 
-/* Message bubble — no avatar */
+/* Message bubble */
 .msg{margin-bottom:10px}
 .bubble{
   display:inline-block;max-width:88%;
@@ -92,9 +87,7 @@ body{
 }
 
 /* Audio card */
-.audio-card{cursor:pointer;transition:all .15s;min-width:210px}
-.audio-card:active{opacity:.7}
-
+.audio-card{min-width:220px}
 .ac-header{display:flex;align-items:center;gap:10px}
 .ac-play{
   flex-shrink:0;width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;
@@ -111,7 +104,6 @@ body{
   0%,100%{box-shadow:0 0 8px rgba(255,255,255,.1)}
   50%{box-shadow:0 0 16px rgba(255,255,255,.3)}
 }
-
 .ac-info{flex:1;min-width:0}
 .ac-title{
   font-size:.88rem;font-weight:500;color:#fff;
@@ -119,6 +111,7 @@ body{
 }
 .ac-meta{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:1px}
 
+/* Waveform */
 .ac-wave{display:flex;align-items:center;gap:2px;height:18px;margin-top:6px}
 .ac-wave .bar{width:2.5px;border-radius:2px;background:rgba(255,255,255,.2);height:4px}
 .ac-wave.active .bar{animation:wave .6s ease-in-out infinite alternate;background:rgba(255,255,255,.7)}
@@ -132,51 +125,47 @@ body{
 .ac-wave.active .bar:nth-child(8){animation-delay:.1s}
 @keyframes wave{0%{height:4px}100%{height:18px}}
 
-/* Player bar */
-.player-bar{
-  position:fixed;bottom:0;left:0;right:0;z-index:100;
-  background:rgba(20,20,20,.85);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-top:1px solid rgba(255,255,255,.06);
-  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+/* Progress row — only visible on current card */
+.ac-progress{
+  display:flex;align-items:center;gap:8px;
+  margin-top:8px;height:20px;
 }
-.player-bar.visible{transform:translateY(0)}
+.ac-prog-bar{flex:1;height:3px;background:rgba(255,255,255,.12);border-radius:2px;position:relative;cursor:pointer;touch-action:none}
+.ac-prog-fill{height:100%;background:rgba(255,255,255,.7);border-radius:2px;width:0%;transition:none}
+.ac-prog-fill::after{
+  content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);
+  width:8px;height:8px;background:#fff;border-radius:50%;
+}
+.ac-time{font-size:.62rem;color:rgba(255,255,255,.4);white-space:nowrap;min-width:66px;text-align:center}
+.ac-speed{
+  font-size:.62rem;font-weight:700;
+  padding:2px 6px;background:rgba(255,255,255,.15);border:none;
+  color:rgba(255,255,255,.6);border-radius:6px;cursor:pointer;
+  white-space:nowrap;
+}
+.ac-speed:active{background:rgba(255,255,255,.25)}
 
-.p-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.p-avatar{width:34px;height:34px;border-radius:8px;overflow:hidden;flex-shrink:0}
-.p-avatar img{width:100%;height:100%;object-fit:cover}
-.p-info{flex:1;min-width:0}
-.p-info .t{font-size:.8rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.p-info .m{font-size:.68rem;color:rgba(255,255,255,.4)}
+/* Actions row */
+.ac-actions{display:flex;align-items:center;gap:6px;margin-top:6px}
+.ac-btn{
+  font-size:.72rem;color:rgba(255,255,255,.5);
+  background:none;border:none;cursor:pointer;
+  padding:3px 0;display:flex;align-items:center;gap:3px;
+}
+.ac-btn:active{color:rgba(255,255,255,.8)}
+.ac-btn svg{width:12px;height:12px}
 
-.prog-wrap{width:100%;height:24px;display:flex;align-items:center;cursor:pointer;touch-action:none}
-.prog-bg{width:100%;height:2.5px;background:rgba(255,255,255,.12);border-radius:2px;position:relative}
-.prog-fill{height:100%;background:#fff;border-radius:2px;width:0%;position:relative;transition:none}
-.prog-fill::after{
-  content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%);
-  width:10px;height:10px;background:#fff;border-radius:50%;
+/* Script text */
+.ac-script{
+  margin-top:8px;padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.08);
+  font-size:.78rem;line-height:1.7;color:rgba(255,255,255,.7);
+  max-height:280px;overflow-y:auto;
+  white-space:pre-wrap;
+  -webkit-overflow-scrolling:touch;
 }
-.time-row{display:flex;justify-content:space-between;font-size:.66rem;color:rgba(255,255,255,.35);margin:2px 0 8px}
-
-.controls{display:flex;align-items:center;justify-content:center;gap:14px}
-.ctrl-btn{
-  background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;
-  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;transition:all .15s;
-}
-.ctrl-btn:active{background:rgba(255,255,255,.1)}
-.ctrl-btn.play{
-  width:48px;height:48px;background:#fff;color:#000;border-radius:50%;
-}
-.ctrl-btn.play:active{background:rgba(255,255,255,.8)}
-.speed-btn{
-  font-size:.74rem;font-weight:700;min-width:40px;
-  padding:5px 8px;background:rgba(255,255,255,.1);border:none;
-  color:rgba(255,255,255,.7);border-radius:8px;cursor:pointer;
-}
-
-.loading{text-align:center;padding:40px;color:rgba(255,255,255,.4);font-size:.85rem}
+.ac-script::-webkit-scrollbar{width:3px}
+.ac-script::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
 
 /* Playing mode — collapse to show only 2 messages */
 .chat-area.playing-mode .msg{display:none}
@@ -189,6 +178,8 @@ body{
   background:rgba(0,0,0,.25);backdrop-filter:blur(8px);
   padding:3px 10px;border-radius:10px;
 }
+
+.loading{text-align:center;padding:40px;color:rgba(255,255,255,.4);font-size:.85rem}
 </style>
 </head>
 <body>
@@ -199,7 +190,7 @@ body{
   <div class="header-inner">
     <div class="header-avatar"><img src="audio/zoey-avatar.jpg" alt="知意" /></div>
     <div class="header-info">
-      <div class="header-name">沈知意</div>
+      <div class="header-name">ZoeyTalk</div>
       <div class="header-tag">内容由 AI 生成</div>
     </div>
   </div>
@@ -212,39 +203,11 @@ body{
   </div>
 </div>
 
-<div class="player-bar" id="playerBar">
-  <div class="p-top">
-    <div class="p-avatar"><img src="audio/zoey-avatar.jpg" alt="" /></div>
-    <div class="p-info">
-      <div class="t" id="nowPlaying">--</div>
-      <div class="m" id="nowMeta">知意</div>
-    </div>
-  </div>
-  <div class="prog-wrap" id="progressWrap">
-    <div class="prog-bg"><div class="prog-fill" id="progressFill"></div></div>
-  </div>
-  <div class="time-row"><span id="timeCur">0:00</span><span id="timeTotal">0:00</span></div>
-  <div class="controls">
-    <button class="ctrl-btn" id="btnBack">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">15</text></svg>
-    </button>
-    <button class="ctrl-btn play" id="btnPlay">
-      <svg id="iconPlay" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>
-      <svg id="iconPause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
-    </button>
-    <button class="ctrl-btn" id="btnFwd">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-weight="bold">30</text></svg>
-    </button>
-    <button class="speed-btn" id="btnSpeed">1.0x</button>
-  </div>
-</div>
-
 <audio id="audio" preload="metadata"></audio>
 
 <script>
 (function(){
   var SPEEDS=[.8,1,1.2,1.5,2],AUDIO_BASE='audio/',MANIFEST_URL='audio/manifest.json',
-      AVATAR='audio/zoey-avatar.jpg',
       BGS=['audio/bg-cafe-casual.jpg','audio/bg-cafe-elegant.jpg','audio/bg-cafe-confident.jpg','audio/bg-cafe-warm.jpg','audio/bg-cafe-gentle.jpg','audio/bg-cafe-chic.jpg','audio/bg-library.jpg','audio/bg-park.jpg'];
 
   var d=new Date(),seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate(),
@@ -252,22 +215,10 @@ body{
   document.getElementById('bgPhoto').style.backgroundImage='url('+BGS[idx]+')';
 
   var audio=document.getElementById('audio'),
-      chatArea=document.getElementById('chatArea'),
-      playerBar=document.getElementById('playerBar'),
-      nowPlaying=document.getElementById('nowPlaying'),
-      nowMeta=document.getElementById('nowMeta'),
-      progressFill=document.getElementById('progressFill'),
-      progressWrap=document.getElementById('progressWrap'),
-      timeCur=document.getElementById('timeCur'),
-      timeTotal=document.getElementById('timeTotal'),
-      btnPlay=document.getElementById('btnPlay'),
-      iconPlay=document.getElementById('iconPlay'),
-      iconPause=document.getElementById('iconPause'),
-      btnBack=document.getElementById('btnBack'),
-      btnFwd=document.getElementById('btnFwd'),
-      btnSpeed=document.getElementById('btnSpeed');
+      chatArea=document.getElementById('chatArea');
 
-  var manifest=[],currentIdx=-1,speedIdx=1;
+  var manifest=[],currentIdx=-1,speedIdx=1,expandedScripts={};
+
   function fmt(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec}
   var catLabel={briefing:'每日简报',interview:'面试准备'};
 
@@ -292,14 +243,13 @@ body{
     var html='',lastDate='',bars='';
     var isPlaying=currentIdx>=0&&!audio.paused;
 
-    /* Which indices to show: current + 1 neighbor */
+    /* Playing mode: show current + 1 neighbor */
     var showIdx={};
     if(isPlaying){
       showIdx[currentIdx]=true;
       if(currentIdx+1<manifest.length)showIdx[currentIdx+1]=true;
       else if(currentIdx-1>=0)showIdx[currentIdx-1]=true;
     }
-    /* Which dates have visible messages */
     var visDates={};
     for(var k in showIdx){if(manifest[k])visDates[manifest[k].date||'']=true}
 
@@ -309,8 +259,11 @@ body{
 
     for(var i=0;i<manifest.length;i++){
       var a=manifest[i],ds=a.date||'',cat=a.category||'other',
-          isP=i===currentIdx&&!audio.paused;
+          isP=i===currentIdx&&!audio.paused,
+          isCur=i===currentIdx;
       var show=!isPlaying||showIdx[i];
+      var hasScript=!!a.script;
+      var scriptOpen=!!expandedScripts[i];
 
       if(ds!==lastDate){
         var dVis=!isPlaying||visDates[ds];
@@ -319,42 +272,118 @@ body{
       }
 
       if(!show)hiddenAbove++;
-      /* Insert collapsed hint once, just before the first visible message */
       if(show&&hiddenAbove>0&&!hintInserted){
         html+='<div class="collapsed-hint vis"><span>'+hiddenAbove+' 条消息</span></div>';
         hintInserted=true;
       }
 
-      html+='<div class="msg'+(show?' vis':'')+'">'+
-        '<div class="bubble">'+
-          '<div class="audio-card" data-idx="'+i+'">'+
-            '<div class="ac-header">'+
-              '<button class="ac-play'+(isP?' playing':'')+'" data-idx="'+i+'">'+
-                (isP?'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>':
-                     '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>')+
-              '</button>'+
-              '<div class="ac-info">'+
-                '<div class="ac-title">'+a.title+'</div>'+
-                '<div class="ac-meta">'+(catLabel[cat]||cat)+'</div>'+
-              '</div>'+
-            '</div>'+
-            '<div class="ac-wave'+(isP?' active':'')+'">'+bars+'</div>'+
+      /* Build card HTML */
+      var card='<div class="audio-card" data-idx="'+i+'">'+
+        '<div class="ac-header">'+
+          '<button class="ac-play'+(isP?' playing':'')+'" data-idx="'+i+'">'+
+            (isP?'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>':
+                 '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 21,12 7,21"/></svg>')+
+          '</button>'+
+          '<div class="ac-info">'+
+            '<div class="ac-title">'+a.title+'</div>'+
+            '<div class="ac-meta">'+(catLabel[cat]||cat)+'</div>'+
           '</div>'+
-        '</div>'+
+        '</div>';
+
+      /* Waveform */
+      card+='<div class="ac-wave'+(isP?' active':'')+'">'+bars+'</div>';
+
+      /* Progress row — only for current item */
+      if(isCur){
+        card+='<div class="ac-progress">'+
+          '<div class="ac-prog-bar" data-idx="'+i+'"><div class="ac-prog-fill" id="progFill"></div></div>'+
+          '<span class="ac-time"><span id="tCur">0:00</span> / <span id="tTot">0:00</span></span>'+
+          '<button class="ac-speed" id="speedBtn">'+SPEEDS[speedIdx]+'x</button>'+
+        '</div>';
+      }
+
+      /* Actions: 查看原文 */
+      if(hasScript){
+        card+='<div class="ac-actions">'+
+          '<button class="ac-btn script-toggle" data-idx="'+i+'">'+
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'+
+            (scriptOpen?'收起原文':'查看原文')+
+          '</button>'+
+        '</div>';
+      }
+
+      /* Script text (expanded) */
+      if(hasScript&&scriptOpen){
+        card+='<div class="ac-script">'+escHtml(a.script)+'</div>';
+      }
+
+      card+='</div>';
+
+      html+='<div class="msg'+(show?' vis':'')+'">'+
+        '<div class="bubble">'+card+'</div>'+
       '</div>';
     }
 
     if(isPlaying)chatArea.classList.add('playing-mode');
     else chatArea.classList.remove('playing-mode');
     chatArea.innerHTML=html;
+    bindEvents();
+  }
 
-    chatArea.querySelectorAll('.audio-card,.ac-play').forEach(function(el){
+  function escHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function bindEvents(){
+    /* Play/pause buttons */
+    chatArea.querySelectorAll('.ac-play').forEach(function(el){
       el.onclick=function(e){
         e.stopPropagation();
         var n=parseInt(el.dataset.idx);
         if(n===currentIdx&&!audio.paused)audio.pause();else play(n);
       };
     });
+
+    /* Script toggle */
+    chatArea.querySelectorAll('.script-toggle').forEach(function(el){
+      el.onclick=function(e){
+        e.stopPropagation();
+        var n=parseInt(el.dataset.idx);
+        expandedScripts[n]=!expandedScripts[n];
+        render();
+        /* Scroll to this card */
+        setTimeout(function(){
+          var card=chatArea.querySelector('.audio-card[data-idx="'+n+'"]');
+          if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+        },50);
+      };
+    });
+
+    /* Progress bar seek */
+    var progBar=chatArea.querySelector('.ac-prog-bar');
+    if(progBar){
+      function seekFromBar(e){
+        var r=progBar.getBoundingClientRect(),
+            x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+        audio.currentTime=Math.max(0,Math.min(1,x/r.width))*(audio.duration||0);
+      }
+      progBar.onclick=seekFromBar;
+      var drag=false;
+      progBar.addEventListener('touchstart',function(e){drag=true;seekFromBar(e)},{passive:true});
+      document.addEventListener('touchmove',function(e){if(drag)seekFromBar(e)},{passive:true});
+      document.addEventListener('touchend',function(){drag=false});
+    }
+
+    /* Speed button */
+    var speedBtn=document.getElementById('speedBtn');
+    if(speedBtn){
+      speedBtn.onclick=function(e){
+        e.stopPropagation();
+        speedIdx=(speedIdx+1)%SPEEDS.length;
+        audio.playbackRate=SPEEDS[speedIdx];
+        speedBtn.textContent=SPEEDS[speedIdx]+'x';
+      };
+    }
   }
 
   function play(n){
@@ -362,42 +391,31 @@ body{
     currentIdx=n;var a=manifest[n];
     audio.src=AUDIO_BASE+a.file;audio.playbackRate=SPEEDS[speedIdx];
     audio.play().catch(function(){});
-    nowPlaying.textContent=a.title;
-    nowMeta.textContent=fmtDate(a.date)+' · 知意';
-    playerBar.classList.add('visible');render();
-    var card=chatArea.querySelector('.audio-card[data-idx="'+n+'"]');
-    if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+    render();
+    setTimeout(function(){
+      var card=chatArea.querySelector('.audio-card[data-idx="'+n+'"]');
+      if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+    },50);
   }
 
-  btnPlay.onclick=function(){if(!audio.src)return;if(audio.paused)audio.play().catch(function(){});else audio.pause()};
-  btnBack.onclick=function(){audio.currentTime=Math.max(0,audio.currentTime-15)};
-  btnFwd.onclick=function(){audio.currentTime=Math.min(audio.duration||0,audio.currentTime+30)};
-  btnSpeed.onclick=function(){speedIdx=(speedIdx+1)%SPEEDS.length;audio.playbackRate=SPEEDS[speedIdx];btnSpeed.textContent=SPEEDS[speedIdx]+'x'};
-
-  audio.addEventListener('play',function(){iconPlay.style.display='none';iconPause.style.display='';render()});
-  audio.addEventListener('pause',function(){iconPlay.style.display='';iconPause.style.display='none';render()});
+  audio.addEventListener('play',function(){render()});
+  audio.addEventListener('pause',function(){render()});
   audio.addEventListener('timeupdate',function(){
     if(!audio.duration)return;
-    progressFill.style.width=(audio.currentTime/audio.duration*100)+'%';
-    timeCur.textContent=fmt(audio.currentTime);timeTotal.textContent=fmt(audio.duration);
+    var fill=document.getElementById('progFill');
+    var tCur=document.getElementById('tCur');
+    var tTot=document.getElementById('tTot');
+    if(fill)fill.style.width=(audio.currentTime/audio.duration*100)+'%';
+    if(tCur)tCur.textContent=fmt(audio.currentTime);
+    if(tTot)tTot.textContent=fmt(audio.duration);
   });
-  audio.addEventListener('ended',function(){if(currentIdx<manifest.length-1)play(currentIdx+1);else render()});
+  audio.addEventListener('ended',function(){if(currentIdx<manifest.length-1)play(currentIdx+1);else{currentIdx=-1;render()}});
 
-  function seek(e){
-    var r=progressWrap.getBoundingClientRect(),
-        x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
-    audio.currentTime=Math.max(0,Math.min(1,x/r.width))*(audio.duration||0);
-  }
-  progressWrap.addEventListener('click',seek);
-  var drag=false;
-  progressWrap.addEventListener('touchstart',function(e){drag=true;seek(e)},{passive:true});
-  document.addEventListener('touchmove',function(e){if(drag)seek(e)},{passive:true});
-  document.addEventListener('touchend',function(){drag=false});
-
+  /* MediaSession for lock screen controls */
   if('mediaSession' in navigator){
     audio.addEventListener('play',function(){
       var a=manifest[currentIdx];if(!a)return;
-      navigator.mediaSession.metadata=new MediaMetadata({title:a.title,artist:'沈知意 | Zoey',album:catLabel[a.category]||'Audio'});
+      navigator.mediaSession.metadata=new MediaMetadata({title:a.title,artist:'ZoeyTalk',album:catLabel[a.category]||'Audio'});
     });
     navigator.mediaSession.setActionHandler('play',function(){audio.play()});
     navigator.mediaSession.setActionHandler('pause',function(){audio.pause()});
