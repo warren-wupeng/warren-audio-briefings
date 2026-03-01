@@ -98,16 +98,95 @@
   .feature-list li { padding: 10px 0; border-bottom: 1px solid rgba(30,41,59,0.5); font-size: 1rem; display: flex; align-items: baseline; gap: 12px; }
   .feature-list .bullet { color: #818cf8; font-size: 0.8rem; }
 
+  /* Tablet */
   @media (max-width: 768px) {
     .slide { padding: 32px 24px; }
     h1 { font-size: 2rem; }
     h2 { font-size: 1.4rem; }
-    .cards { flex-direction: column; }
+    h3 { font-size: 1.1rem; }
+    p { font-size: 1rem; }
+    .subtitle { font-size: 1.15rem; }
+    .tagline { font-size: 1.2rem; }
+    .cards { flex-direction: column; gap: 16px; }
+    .card { padding: 18px; }
     .comparison-table { font-size: 0.85rem; }
     .comparison-table th, .comparison-table td { padding: 8px 12px; }
-    .timeline { flex-direction: column; }
+    .timeline { flex-direction: column; gap: 0; }
+    .phase { padding: 12px 16px; border-left: 3px solid; }
     .versions { height: 150px; }
     .ver-fill { width: 36px; }
+    .code { font-size: 0.8rem; padding: 16px; white-space: pre-wrap; word-break: break-word; }
+    .flow { gap: 8px; }
+    .flow-step { padding: 8px 12px; font-size: 0.8rem; }
+    .flow-arrow { font-size: 1rem; }
+    .nav { bottom: 16px; right: 16px; }
+    .slide-num { bottom: 20px; left: 16px; }
+  }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    body { overflow-y: auto; }
+    .deck { height: auto; min-height: 100vh; }
+    .slide { padding: 24px 18px; min-height: 100vh; height: auto; justify-content: flex-start; padding-top: 40px; padding-bottom: 80px; }
+    h1 { font-size: 1.55rem; line-height: 1.3; margin-bottom: 10px; }
+    h2 { font-size: 1.25rem; margin-bottom: 16px; }
+    h3 { font-size: 0.95rem; margin-bottom: 10px; }
+    p { font-size: 0.9rem; line-height: 1.6; }
+    .subtitle { font-size: 1rem; }
+    .tagline { font-size: 1.05rem; margin-top: 14px; }
+
+    /* Cards: full width, tighter */
+    .cards { flex-direction: column; gap: 12px; margin-top: 16px; }
+    .card { padding: 14px 16px; }
+    .card-title { font-size: 1rem; }
+    .card-desc { font-size: 0.82rem; line-height: 1.5; }
+    .card-tools { font-size: 0.7rem; margin-top: 8px; word-break: break-word; }
+
+    /* Table: horizontal scroll wrapper */
+    .comparison-table { font-size: 0.78rem; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .comparison-table th, .comparison-table td { padding: 7px 10px; white-space: nowrap; }
+
+    /* Code: wrap on mobile */
+    .code { font-size: 0.72rem; padding: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; overflow-x: hidden; max-width: 100%; }
+
+    /* Flow diagram: vertical on mobile */
+    .flow { flex-direction: column; align-items: stretch; gap: 6px; margin-top: 12px; }
+    .flow-step { padding: 10px 14px; font-size: 0.8rem; text-align: left; }
+    .flow-arrow { transform: rotate(90deg); text-align: center; font-size: 0.9rem; }
+
+    /* Timeline: vertical, compact */
+    .timeline { flex-direction: column; gap: 0; margin-top: 16px; }
+    .phase { padding: 10px 14px; }
+    .phase-title { font-size: 0.78rem; margin-bottom: 6px; }
+    .phase-items { font-size: 0.78rem; line-height: 1.7; }
+
+    /* Version bars: smaller */
+    .versions { height: 120px; gap: 4px; margin-top: 20px; justify-content: center; }
+    .ver-fill { width: 28px; }
+    .ver-label { font-size: 0.65rem; }
+    .ver-num { font-size: 0.6rem; }
+
+    /* Feature list */
+    .feature-list li { font-size: 0.88rem; padding: 8px 0; }
+
+    /* Nav */
+    .nav { bottom: 12px; right: 12px; gap: 6px; }
+    .nav button { padding: 10px 18px; font-size: 0.85rem; -webkit-tap-highlight-color: transparent; }
+    .slide-num { bottom: 16px; left: 14px; font-size: 0.78rem; }
+    .progress-bar { height: 3px; }
+
+    /* Closing slide credits */
+    .slide:last-child > div:last-child { flex-wrap: wrap; gap: 12px 20px; font-size: 0.78rem; }
+  }
+
+  /* Very small screens */
+  @media (max-width: 360px) {
+    .slide { padding: 20px 14px; padding-top: 36px; }
+    h1 { font-size: 1.35rem; }
+    h2 { font-size: 1.1rem; }
+    .code { font-size: 0.65rem; padding: 10px; }
+    .ver-fill { width: 22px; }
+    .card { padding: 12px; }
   }
 </style>
 </head>
