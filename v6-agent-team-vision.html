@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V6 Agent Team — Product Vision</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif; background: #0a0a0f; color: #e0e0e8; overflow: hidden; }
+
+  .deck { width: 100vw; height: 100vh; position: relative; }
+  .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  /* Slide backgrounds */
+  .slide::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+  .slide:nth-child(1)::before { background: radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.15) 0%, transparent 60%); }
+  .slide:nth-child(2)::before { background: radial-gradient(ellipse at 70% 30%, rgba(244,63,94,0.12) 0%, transparent 60%); }
+  .slide:nth-child(3)::before { background: radial-gradient(ellipse at 50% 70%, rgba(34,197,94,0.12) 0%, transparent 60%); }
+  .slide:nth-child(4)::before { background: radial-gradient(ellipse at 30% 40%, rgba(251,146,60,0.12) 0%, transparent 60%); }
+  .slide:nth-child(5)::before { background: radial-gradient(ellipse at 60% 50%, rgba(99,102,241,0.12) 0%, transparent 60%); }
+  .slide:nth-child(6)::before { background: radial-gradient(ellipse at 40% 60%, rgba(34,197,94,0.12) 0%, transparent 60%); }
+  .slide:nth-child(7)::before { background: radial-gradient(ellipse at 50% 40%, rgba(244,63,94,0.12) 0%, transparent 60%); }
+  .slide:nth-child(8)::before { background: radial-gradient(ellipse at 60% 60%, rgba(251,146,60,0.12) 0%, transparent 60%); }
+  .slide:nth-child(9)::before { background: radial-gradient(ellipse at 40% 30%, rgba(99,102,241,0.15) 0%, transparent 60%); }
+  .slide:nth-child(10)::before { background: radial-gradient(ellipse at 50% 50%, rgba(244,63,94,0.15) 0%, transparent 50%); }
+
+  h1 { font-size: 3.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+  h2 { font-size: 2rem; font-weight: 600; margin-bottom: 24px; color: #a5b4fc; }
+  h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; color: #94a3b8; }
+  p { font-size: 1.15rem; line-height: 1.7; color: #94a3b8; max-width: 800px; }
+  .highlight { color: #818cf8; }
+  .green { color: #4ade80; }
+  .orange { color: #fb923c; }
+  .red { color: #f43f5e; }
+  .dim { color: #64748b; }
+
+  .subtitle { font-size: 1.4rem; color: #64748b; margin-top: 8px; font-weight: 400; }
+  .tagline { font-size: 1.6rem; color: #a5b4fc; font-style: italic; margin-top: 20px; font-weight: 300; }
+
+  /* Tables */
+  .comparison-table { border-collapse: collapse; margin-top: 24px; width: 100%; max-width: 850px; }
+  .comparison-table th { padding: 12px 20px; text-align: left; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; border-bottom: 1px solid #1e293b; }
+  .comparison-table td { padding: 12px 20px; font-size: 1rem; border-bottom: 1px solid rgba(30,41,59,0.5); }
+  .comparison-table tr:hover td { background: rgba(99,102,241,0.05); }
+
+  /* Cards */
+  .cards { display: flex; gap: 24px; margin-top: 24px; width: 100%; max-width: 900px; }
+  .card { flex: 1; background: rgba(30,41,59,0.4); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 24px; }
+  .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+  .card-desc { font-size: 0.9rem; color: #94a3b8; line-height: 1.6; }
+  .card-tools { font-size: 0.8rem; color: #64748b; margin-top: 12px; font-family: 'SF Mono', monospace; }
+  .card.pm { border-top: 3px solid #818cf8; }
+  .card.eng { border-top: 3px solid #4ade80; }
+  .card.strat { border-top: 3px solid #fb923c; }
+
+  /* Code blocks */
+  .code { background: rgba(15,23,42,0.8); border: 1px solid #1e293b; border-radius: 8px; padding: 20px 24px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9rem; line-height: 1.8; max-width: 750px; width: 100%; margin-top: 16px; color: #cbd5e1; white-space: pre; overflow-x: auto; }
+  .code .comment { color: #475569; }
+  .code .keyword { color: #818cf8; }
+  .code .string { color: #4ade80; }
+  .code .fn { color: #fb923c; }
+
+  /* Flow diagram */
+  .flow { display: flex; align-items: center; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  .flow-step { background: rgba(30,41,59,0.6); border: 1px solid #1e293b; border-radius: 8px; padding: 12px 18px; font-size: 0.9rem; text-align: center; }
+  .flow-arrow { color: #475569; font-size: 1.2rem; }
+  .flow-step.pm-step { border-color: rgba(129,140,248,0.3); color: #a5b4fc; }
+  .flow-step.eng-step { border-color: rgba(74,222,128,0.3); color: #86efac; }
+  .flow-step.strat-step { border-color: rgba(251,146,60,0.3); color: #fdba74; }
+
+  /* Timeline */
+  .timeline { display: flex; gap: 0; margin-top: 24px; width: 100%; max-width: 850px; }
+  .phase { flex: 1; padding: 16px; border-left: 3px solid #1e293b; }
+  .phase:first-child { border-left: 3px solid #818cf8; }
+  .phase:nth-child(2) { border-left: 3px solid #4ade80; }
+  .phase:nth-child(3) { border-left: 3px solid #fb923c; }
+  .phase:nth-child(4) { border-left: 3px solid #f43f5e; }
+  .phase-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .phase-items { font-size: 0.85rem; color: #94a3b8; line-height: 1.8; }
+
+  /* Version evolution */
+  .versions { display: flex; align-items: flex-end; gap: 8px; margin-top: 32px; height: 200px; }
+  .ver-bar { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .ver-fill { width: 60px; border-radius: 4px 4px 0 0; transition: height 1s ease; }
+  .ver-label { font-size: 0.75rem; color: #64748b; }
+  .ver-num { font-size: 0.7rem; color: #475569; }
+
+  /* Navigation */
+  .nav { position: fixed; bottom: 24px; right: 32px; display: flex; gap: 8px; z-index: 100; }
+  .nav button { background: rgba(30,41,59,0.8); border: 1px solid #1e293b; color: #94a3b8; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+  .nav button:hover { background: rgba(99,102,241,0.2); border-color: #818cf8; color: #e0e0e8; }
+  .progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, #818cf8, #4ade80); transition: width 0.3s ease; z-index: 100; }
+  .slide-num { position: fixed; bottom: 28px; left: 32px; font-size: 0.85rem; color: #475569; z-index: 100; }
+
+  /* List */
+  .feature-list { list-style: none; margin-top: 16px; max-width: 750px; }
+  .feature-list li { padding: 10px 0; border-bottom: 1px solid rgba(30,41,59,0.5); font-size: 1rem; display: flex; align-items: baseline; gap: 12px; }
+  .feature-list .bullet { color: #818cf8; font-size: 0.8rem; }
+
+  @media (max-width: 768px) {
+    .slide { padding: 32px 24px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.4rem; }
+    .cards { flex-direction: column; }
+    .comparison-table { font-size: 0.85rem; }
+    .comparison-table th, .comparison-table td { padding: 8px 12px; }
+    .timeline { flex-direction: column; }
+    .versions { height: 150px; }
+    .ver-fill { width: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<div class="slide-num" id="slideNum"></div>
+
+<div class="deck" id="deck">
+
+  <!-- Slide 1: Cover -->
+  <div class="slide active">
+    <h1>Build My Own Coding Agent</h1>
+    <h1><span class="highlight">V6 — Agent Team</span></h1>
+    <p class="subtitle">From Solo Coder to Product Team</p>
+    <p class="tagline">"Describe your product. Your AI team builds it."</p>
+    <p style="margin-top: 40px; font-size: 0.9rem; color: #475569;">Product Owner: Zoey | 2026-03-02</p>
+  </div>
+
+  <!-- Slide 2: Evolution -->
+  <div class="slide">
+    <h2>V0 to V6: The Evolution</h2>
+    <p>From 33 lines of bash to a multi-agent product team.</p>
+    <div class="versions">
+      <div class="ver-bar"><div class="ver-fill" style="height:4px; background:#475569;"></div><div class="ver-label">V0</div><div class="ver-num">33</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="height:6px; background:#475569;"></div><div class="ver-label">V1</div><div class="ver-num">157</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="height:12px; background:#64748b;"></div><div class="ver-label">V2</div><div class="ver-num">521</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="height:30px; background:#64748b;"></div><div class="ver-label">V3</div><div class="ver-num">1.8K</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="height:80px; background:#818cf8;"></div><div class="ver-label">V4</div><div class="ver-num">5.5K</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="height:130px; background:#818cf8;"></div><div class="ver-label">V5</div><div class="ver-num">9.3K</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="height:200px; background:linear-gradient(180deg, #818cf8, #4ade80);"></div><div class="ver-label" style="color:#4ade80; font-weight:600;">V6</div><div class="ver-num" style="color:#4ade80;">??K</div></div>
+    </div>
+    <p style="margin-top: 24px; font-size: 0.95rem;">
+      <span class="dim">V0-V1</span> Script | <span class="dim">V2-V3</span> Tool System | <span class="highlight">V4</span> Sub-agent | <span class="highlight">V5</span> Evaluation | <span class="green">V6</span> Agent Team
+    </p>
+  </div>
+
+  <!-- Slide 3: The Problem -->
+  <div class="slide">
+    <h2>The Problem</h2>
+    <h3 style="color: #f43f5e; margin-bottom: 32px;">Every existing coding agent is a solo performer.</h3>
+    <table class="comparison-table">
+      <tr><th>Dimension</th><th>V5 (Solo)</th><th style="color:#4ade80;">V6 (Team)</th></tr>
+      <tr><td>Agent Count</td><td class="dim">1</td><td class="green">3 specialized roles</td></tr>
+      <tr><td>Drive Model</td><td class="dim">User prompt -> Response</td><td class="green">Heartbeat-driven autonomous</td></tr>
+      <tr><td>State</td><td class="dim">In-memory messages</td><td class="green">Git-based persistent</td></tr>
+      <tr><td>Communication</td><td class="dim">None (single agent)</td><td class="green">Async mailbox</td></tr>
+      <tr><td>Task Granularity</td><td class="dim">One-shot instruction</td><td class="green">Issue lifecycle</td></tr>
+      <tr><td>Deliverable</td><td class="dim">Code files</td><td class="green">Complete product</td></tr>
+    </table>
+  </div>
+
+  <!-- Slide 4: Three Agents -->
+  <div class="slide">
+    <h2>Three Agent Roles</h2>
+    <div class="cards">
+      <div class="card pm">
+        <div class="card-title"><span class="highlight">PM Agent</span></div>
+        <div class="card-desc">Understands user intent. Breaks down requirements into Issues. Assigns, coordinates, and accepts deliverables. Makes product decisions.</div>
+        <div class="card-tools">Tools: create_issue, assign_task, check_progress, send_message, read_sop</div>
+      </div>
+      <div class="card eng">
+        <div class="card-title"><span class="green">Engineer Agent</span></div>
+        <div class="card-desc">Receives well-defined Issues. Writes code, runs tests, fixes bugs. Strictly executes within scope. Reports back on completion.</div>
+        <div class="card-tools">Tools: all 15 V5 tools + send_message, check_mailbox</div>
+      </div>
+      <div class="card strat">
+        <div class="card-title"><span class="orange">Strategist Agent</span></div>
+        <div class="card-desc">Writes README, docs, CHANGELOG. Focuses on product narrative and user experience. Scans for improvement opportunities.</div>
+        <div class="card-tools">Tools: file R/W + send_message, check_mailbox, web_search</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Heartbeat -->
+  <div class="slide">
+    <h2>Core Mechanism: Heartbeat</h2>
+    <p>Agents don't wait for instructions. They wake up, check state, and push forward.</p>
+    <div class="code"><span class="keyword">def</span> <span class="fn">tick</span>(self):
+    <span class="comment"># Every agent runs this on a configurable interval</span>
+    self.<span class="fn">git_pull</span>()              <span class="comment"># 1. Sync latest state</span>
+    self.<span class="fn">check_mailbox</span>()         <span class="comment"># 2. Read new messages</span>
+    self.<span class="fn">check_tasks</span>()           <span class="comment"># 3. Check assigned issues</span>
+    self.<span class="fn">execute_sop</span>()           <span class="comment"># 4. Follow role-specific SOP</span>
+    self.<span class="fn">push_progress</span>()         <span class="comment"># 5. Commit & push updates</span></div>
+    <p style="margin-top: 20px;">The key phrase is <span class="green">"continue pushing forward"</span> -- agents find work to do, not wait for it.</p>
+  </div>
+
+  <!-- Slide 6: Shared Brain -->
+  <div class="slide">
+    <h2>Git as Shared Brain</h2>
+    <p>All agents share state through a single Git repository. Persistent, auditable, human-readable.</p>
+    <div class="code"><span class="string">project-repo/</span>
+<span class="string">.agent-team/</span>
+  <span class="keyword">config.yaml</span>           <span class="comment"># Team config (roles, intervals)</span>
+  <span class="keyword">issues/</span>                <span class="comment"># Issue files (Markdown)</span>
+    001-setup-project.md
+    002-implement-auth.md
+  <span class="keyword">mailbox/</span>               <span class="comment"># Async communication</span>
+    pm-to-engineer/
+    engineer-to-pm/
+  <span class="keyword">sop/</span>                   <span class="comment"># Role playbooks</span>
+    pm.md
+    engineer.md
+    strategist.md
+  <span class="keyword">memory/</span>                <span class="comment"># Persistent knowledge</span>
+    decisions.md
+    user-prefs.md
+<span class="string">src/</span>                     <span class="comment"># Product code</span>
+<span class="string">docs/</span>                    <span class="comment"># Product docs</span></div>
+  </div>
+
+  <!-- Slide 7: Workflow -->
+  <div class="slide">
+    <h2>How It Works</h2>
+    <h3>User: "I want to build a Todo App"</h3>
+    <div class="flow">
+      <div class="flow-step pm-step">PM: Break into 5 Issues</div>
+      <div class="flow-arrow">--></div>
+      <div class="flow-step pm-step">Assign #1 #2 to Engineer</div>
+      <div class="flow-arrow">--></div>
+      <div class="flow-step eng-step">Engineer: Build project structure</div>
+    </div>
+    <div class="flow" style="margin-top: 12px;">
+      <div class="flow-step eng-step">Engineer: Implement CRUD API</div>
+      <div class="flow-arrow">--></div>
+      <div class="flow-step pm-step">PM: Accept & unblock #3 #4</div>
+      <div class="flow-arrow">--></div>
+      <div class="flow-step eng-step">Engineer: Build frontend</div>
+    </div>
+    <div class="flow" style="margin-top: 12px;">
+      <div class="flow-step strat-step">Strategist: Write README & docs</div>
+      <div class="flow-arrow">--></div>
+      <div class="flow-step pm-step">PM: All 5 issues accepted</div>
+      <div class="flow-arrow">--></div>
+      <div class="flow-step" style="border-color: rgba(244,63,94,0.4); color: #fda4af;">Product delivered</div>
+    </div>
+    <p style="margin-top: 20px;">User goes to sleep. Wakes up to a working Todo App with documentation.</p>
+  </div>
+
+  <!-- Slide 8: User Experience -->
+  <div class="slide">
+    <h2>User Experience</h2>
+    <div class="code"><span class="comment"># Initialize a product team</span>
+$ <span class="keyword">agent-team</span> <span class="fn">init</span> <span class="string">"I want to build a personal blog with comments"</span>
+
+<span class="comment"># Team starts working autonomously</span>
+$ <span class="keyword">agent-team</span> <span class="fn">start</span>
+<span class="green">PM Agent started (heartbeat: 60s)</span>
+<span class="green">Engineer Agent started (heartbeat: 60s)</span>
+<span class="green">Strategist Agent started (heartbeat: 60s)</span>
+
+<span class="comment"># Check progress anytime</span>
+$ <span class="keyword">agent-team</span> <span class="fn">status</span>
+<span class="highlight">Issue #1</span> Setup project        <span class="green">DONE</span>   (engineer)
+<span class="highlight">Issue #2</span> Data models           <span class="green">DONE</span>   (engineer)
+<span class="highlight">Issue #3</span> CRUD API              <span class="orange">IN PROGRESS</span> (engineer)
+<span class="highlight">Issue #4</span> Frontend              BLOCKED (depends #3)
+<span class="highlight">Issue #5</span> README & docs         <span class="orange">IN PROGRESS</span> (strategist)
+
+<span class="comment"># Chat with PM to add features</span>
+$ <span class="keyword">agent-team</span> <span class="fn">chat</span> <span class="string">"Add dark mode support"</span>
+<span class="highlight">PM:</span> Created Issue #6: Dark mode toggle. Assigned to engineer.</div>
+  </div>
+
+  <!-- Slide 9: Implementation Plan -->
+  <div class="slide">
+    <h2>Implementation Plan</h2>
+    <div class="timeline">
+      <div class="phase">
+        <div class="phase-title" style="color: #a5b4fc;">Phase 1</div>
+        <div class="phase-items">
+          <strong>Infrastructure</strong><br>
+          #1 Project structure<br>
+          #2 Mailbox system<br>
+          #3 Heartbeat driver<br>
+          #4 Git shared state<br>
+          #5 SOP parser<br>
+          #6 Issue manager<br>
+          <span class="dim">Owner: Kira</span>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-title" style="color: #86efac;">Phase 2</div>
+        <div class="phase-items">
+          <strong>Agent Roles</strong><br>
+          #7 PM Agent<br>
+          #8 Engineer Agent<br>
+          #9 Strategist Agent<br>
+          #10 Team Orchestrator<br>
+          <br><br>
+          <span class="dim">Owner: Kira</span>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-title" style="color: #fdba74;">Phase 3</div>
+        <div class="phase-items">
+          <strong>CLI & UX</strong><br>
+          #11 CLI tool<br>
+          #12 Default SOPs<br>
+          #13 README & docs<br>
+          #14 Demo scenario<br>
+          <br><br>
+          <span class="dim">Owner: Kira + Luca</span>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-title" style="color: #fda4af;">Phase 4</div>
+        <div class="phase-items">
+          <strong>Evaluation</strong><br>
+          #15 Team eval framework<br>
+          #16 E2E demo<br>
+          <br><br><br><br>
+          <span class="dim">Owner: Kira + Luca</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top: 24px;">16 Issues | 4 Phases | 2 engineers (Kira + Luca)</p>
+  </div>
+
+  <!-- Slide 10: Closing -->
+  <div class="slide">
+    <h1>V5 taught agents to code.</h1>
+    <h1><span class="green">V6 teaches agents to ship products.</span></h1>
+    <p class="tagline" style="margin-top: 32px;">"Describe your product. Your AI team builds it."</p>
+    <div style="margin-top: 48px; display: flex; gap: 32px; font-size: 0.9rem; color: #475569;">
+      <div>PM: Zoey</div>
+      <div>Tech: Kira</div>
+      <div>Strategy: Luca</div>
+      <div>Repo: warren-wupeng/build-my-own-coding-agent</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button onclick="prevSlide()">Prev</button>
+  <button onclick="nextSlide()">Next</button>
+</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+
+function showSlide(n) {
+  slides[current].classList.remove('active');
+  current = (n + total) % total;
+  slides[current].classList.add('active');
+  document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+  document.getElementById('slideNum').textContent = (current + 1) + ' / ' + total;
+}
+
+function nextSlide() { showSlide(current + 1); }
+function prevSlide() { showSlide(current - 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+});
+
+showSlide(0);
+</script>
+</body>
+</html>
