@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>V6 Agent Team — Product Vision</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif; background: #0a0a0f; color: #e0e0e8; overflow: hidden; }
 
   .deck { width: 100vw; height: 100vh; position: relative; }
-  .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+  .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; overflow-y: auto; }
   .slide.active { opacity: 1; pointer-events: auto; }
 
-  /* Slide backgrounds */
   .slide::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
   .slide:nth-child(1)::before { background: radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.15) 0%, transparent 60%); }
   .slide:nth-child(2)::before { background: radial-gradient(ellipse at 70% 30%, rgba(244,63,94,0.12) 0%, transparent 60%); }
@@ -79,10 +78,10 @@
   .phase-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
   .phase-items { font-size: 0.85rem; color: #94a3b8; line-height: 1.8; }
 
-  /* Version evolution */
+  /* Version evolution - use CSS custom props for scaling */
   .versions { display: flex; align-items: flex-end; gap: 8px; margin-top: 32px; height: 200px; }
   .ver-bar { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .ver-fill { width: 60px; border-radius: 4px 4px 0 0; transition: height 1s ease; }
+  .ver-fill { width: 60px; border-radius: 4px 4px 0 0; transition: height 1s ease; height: calc(var(--h) * 1px); }
   .ver-label { font-size: 0.75rem; color: #64748b; }
   .ver-num { font-size: 0.7rem; color: #475569; }
 
@@ -92,6 +91,10 @@
   .nav button:hover { background: rgba(99,102,241,0.2); border-color: #818cf8; color: #e0e0e8; }
   .progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, #818cf8, #4ade80); transition: width 0.3s ease; z-index: 100; }
   .slide-num { position: fixed; bottom: 28px; left: 32px; font-size: 0.85rem; color: #475569; z-index: 100; }
+
+  /* Language toggle */
+  .lang-toggle { position: fixed; top: 16px; right: 24px; z-index: 200; background: rgba(30,41,59,0.85); border: 1px solid #1e293b; color: #94a3b8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; letter-spacing: 0.5px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.2s; }
+  .lang-toggle:hover { background: rgba(99,102,241,0.2); border-color: #818cf8; color: #e0e0e8; }
 
   /* List */
   .feature-list { list-style: none; margin-top: 16px; max-width: 750px; }
@@ -112,9 +115,9 @@
     .comparison-table { font-size: 0.85rem; }
     .comparison-table th, .comparison-table td { padding: 8px 12px; }
     .timeline { flex-direction: column; gap: 0; }
-    .phase { padding: 12px 16px; border-left: 3px solid; }
+    .phase { padding: 12px 16px; }
     .versions { height: 150px; }
-    .ver-fill { width: 36px; }
+    .ver-fill { width: 40px; height: calc(var(--h) * 0.75px); }
     .code { font-size: 0.8rem; padding: 16px; white-space: pre-wrap; word-break: break-word; }
     .flow { gap: 8px; }
     .flow-step { padding: 8px 12px; font-size: 0.8rem; }
@@ -127,7 +130,7 @@
   @media (max-width: 480px) {
     body { overflow-y: auto; }
     .deck { height: auto; min-height: 100vh; }
-    .slide { padding: 24px 18px; min-height: 100vh; height: auto; justify-content: flex-start; padding-top: 40px; padding-bottom: 80px; }
+    .slide { padding: 24px 18px; min-height: 100vh; height: auto; justify-content: flex-start; padding-top: 48px; padding-bottom: 80px; }
     h1 { font-size: 1.55rem; line-height: 1.3; margin-bottom: 10px; }
     h2 { font-size: 1.25rem; margin-bottom: 16px; }
     h3 { font-size: 0.95rem; margin-bottom: 10px; }
@@ -135,63 +138,57 @@
     .subtitle { font-size: 1rem; }
     .tagline { font-size: 1.05rem; margin-top: 14px; }
 
-    /* Cards: full width, tighter */
     .cards { flex-direction: column; gap: 12px; margin-top: 16px; }
     .card { padding: 14px 16px; }
     .card-title { font-size: 1rem; }
     .card-desc { font-size: 0.82rem; line-height: 1.5; }
     .card-tools { font-size: 0.7rem; margin-top: 8px; word-break: break-word; }
 
-    /* Table: horizontal scroll wrapper */
     .comparison-table { font-size: 0.78rem; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .comparison-table th, .comparison-table td { padding: 7px 10px; white-space: nowrap; }
 
-    /* Code: wrap on mobile */
     .code { font-size: 0.72rem; padding: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; overflow-x: hidden; max-width: 100%; }
 
-    /* Flow diagram: vertical on mobile */
     .flow { flex-direction: column; align-items: stretch; gap: 6px; margin-top: 12px; }
     .flow-step { padding: 10px 14px; font-size: 0.8rem; text-align: left; }
     .flow-arrow { transform: rotate(90deg); text-align: center; font-size: 0.9rem; }
 
-    /* Timeline: vertical, compact */
     .timeline { flex-direction: column; gap: 0; margin-top: 16px; }
     .phase { padding: 10px 14px; }
     .phase-title { font-size: 0.78rem; margin-bottom: 6px; }
     .phase-items { font-size: 0.78rem; line-height: 1.7; }
 
-    /* Version bars: smaller */
-    .versions { height: 120px; gap: 4px; margin-top: 20px; justify-content: center; }
-    .ver-fill { width: 28px; }
+    /* Chart: scale bars to 55% on mobile */
+    .versions { height: 110px; gap: 6px; margin-top: 16px; justify-content: center; }
+    .ver-fill { width: 30px; height: calc(var(--h) * 0.55px); }
     .ver-label { font-size: 0.65rem; }
     .ver-num { font-size: 0.6rem; }
 
-    /* Feature list */
     .feature-list li { font-size: 0.88rem; padding: 8px 0; }
 
-    /* Nav */
     .nav { bottom: 12px; right: 12px; gap: 6px; }
     .nav button { padding: 10px 18px; font-size: 0.85rem; -webkit-tap-highlight-color: transparent; }
     .slide-num { bottom: 16px; left: 14px; font-size: 0.78rem; }
     .progress-bar { height: 3px; }
+    .lang-toggle { top: 12px; right: 14px; padding: 5px 12px; font-size: 0.75rem; }
 
-    /* Closing slide credits */
     .slide:last-child > div:last-child { flex-wrap: wrap; gap: 12px 20px; font-size: 0.78rem; }
   }
 
-  /* Very small screens */
   @media (max-width: 360px) {
-    .slide { padding: 20px 14px; padding-top: 36px; }
+    .slide { padding: 20px 14px; padding-top: 44px; }
     h1 { font-size: 1.35rem; }
     h2 { font-size: 1.1rem; }
     .code { font-size: 0.65rem; padding: 10px; }
-    .ver-fill { width: 22px; }
+    .ver-fill { width: 24px; height: calc(var(--h) * 0.45px); }
+    .versions { height: 90px; }
     .card { padding: 12px; }
   }
 </style>
 </head>
 <body>
 
+<button class="lang-toggle" id="langBtn" onclick="toggleLang()">ZH</button>
 <div class="progress-bar" id="progress"></div>
 <div class="slide-num" id="slideNum"></div>
 
@@ -199,72 +196,72 @@
 
   <!-- Slide 1: Cover -->
   <div class="slide active">
-    <h1>Build My Own Coding Agent</h1>
-    <h1><span class="highlight">V6 — Agent Team</span></h1>
-    <p class="subtitle">From Solo Coder to Product Team</p>
-    <p class="tagline">"Describe your product. Your AI team builds it."</p>
-    <p style="margin-top: 40px; font-size: 0.9rem; color: #475569;">Product Owner: Zoey | 2026-03-02</p>
+    <h1 data-i18n="s1-t1">Build My Own Coding Agent</h1>
+    <h1><span class="highlight" data-i18n="s1-t2">V6 — Agent Team</span></h1>
+    <p class="subtitle" data-i18n="s1-sub">From Solo Coder to Product Team</p>
+    <p class="tagline" data-i18n="s1-tag">"Describe your product. Your AI team builds it."</p>
+    <p style="margin-top: 40px; font-size: 0.9rem; color: #475569;" data-i18n="s1-credit">Product Owner: Zoey | 2026-03-02</p>
   </div>
 
   <!-- Slide 2: Evolution -->
   <div class="slide">
-    <h2>V0 to V6: The Evolution</h2>
-    <p>From 33 lines of bash to a multi-agent product team.</p>
+    <h2 data-i18n="s2-title">V0 to V6: The Evolution</h2>
+    <p data-i18n="s2-desc">From 33 lines of bash to a multi-agent product team.</p>
     <div class="versions">
-      <div class="ver-bar"><div class="ver-fill" style="height:4px; background:#475569;"></div><div class="ver-label">V0</div><div class="ver-num">33</div></div>
-      <div class="ver-bar"><div class="ver-fill" style="height:6px; background:#475569;"></div><div class="ver-label">V1</div><div class="ver-num">157</div></div>
-      <div class="ver-bar"><div class="ver-fill" style="height:12px; background:#64748b;"></div><div class="ver-label">V2</div><div class="ver-num">521</div></div>
-      <div class="ver-bar"><div class="ver-fill" style="height:30px; background:#64748b;"></div><div class="ver-label">V3</div><div class="ver-num">1.8K</div></div>
-      <div class="ver-bar"><div class="ver-fill" style="height:80px; background:#818cf8;"></div><div class="ver-label">V4</div><div class="ver-num">5.5K</div></div>
-      <div class="ver-bar"><div class="ver-fill" style="height:130px; background:#818cf8;"></div><div class="ver-label">V5</div><div class="ver-num">9.3K</div></div>
-      <div class="ver-bar"><div class="ver-fill" style="height:200px; background:linear-gradient(180deg, #818cf8, #4ade80);"></div><div class="ver-label" style="color:#4ade80; font-weight:600;">V6</div><div class="ver-num" style="color:#4ade80;">??K</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="--h:4; background:#475569;"></div><div class="ver-label">V0</div><div class="ver-num">33</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="--h:6; background:#475569;"></div><div class="ver-label">V1</div><div class="ver-num">157</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="--h:12; background:#64748b;"></div><div class="ver-label">V2</div><div class="ver-num">521</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="--h:30; background:#64748b;"></div><div class="ver-label">V3</div><div class="ver-num">1.8K</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="--h:80; background:#818cf8;"></div><div class="ver-label">V4</div><div class="ver-num">5.5K</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="--h:130; background:#818cf8;"></div><div class="ver-label">V5</div><div class="ver-num">9.3K</div></div>
+      <div class="ver-bar"><div class="ver-fill" style="--h:200; background:linear-gradient(180deg, #818cf8, #4ade80);"></div><div class="ver-label" style="color:#4ade80; font-weight:600;">V6</div><div class="ver-num" style="color:#4ade80;">??K</div></div>
     </div>
-    <p style="margin-top: 24px; font-size: 0.95rem;">
+    <p style="margin-top: 24px; font-size: 0.95rem;" data-i18n="s2-legend">
       <span class="dim">V0-V1</span> Script | <span class="dim">V2-V3</span> Tool System | <span class="highlight">V4</span> Sub-agent | <span class="highlight">V5</span> Evaluation | <span class="green">V6</span> Agent Team
     </p>
   </div>
 
   <!-- Slide 3: The Problem -->
   <div class="slide">
-    <h2>The Problem</h2>
-    <h3 style="color: #f43f5e; margin-bottom: 32px;">Every existing coding agent is a solo performer.</h3>
+    <h2 data-i18n="s3-title">The Problem</h2>
+    <h3 style="color: #f43f5e; margin-bottom: 32px;" data-i18n="s3-sub">Every existing coding agent is a solo performer.</h3>
     <table class="comparison-table">
-      <tr><th>Dimension</th><th>V5 (Solo)</th><th style="color:#4ade80;">V6 (Team)</th></tr>
-      <tr><td>Agent Count</td><td class="dim">1</td><td class="green">3 specialized roles</td></tr>
-      <tr><td>Drive Model</td><td class="dim">User prompt -> Response</td><td class="green">Heartbeat-driven autonomous</td></tr>
-      <tr><td>State</td><td class="dim">In-memory messages</td><td class="green">Git-based persistent</td></tr>
-      <tr><td>Communication</td><td class="dim">None (single agent)</td><td class="green">Async mailbox</td></tr>
-      <tr><td>Task Granularity</td><td class="dim">One-shot instruction</td><td class="green">Issue lifecycle</td></tr>
-      <tr><td>Deliverable</td><td class="dim">Code files</td><td class="green">Complete product</td></tr>
+      <tr><th data-i18n="s3-th1">Dimension</th><th data-i18n="s3-th2">V5 (Solo)</th><th style="color:#4ade80;" data-i18n="s3-th3">V6 (Team)</th></tr>
+      <tr><td data-i18n="s3-r1c1">Agent Count</td><td class="dim" data-i18n="s3-r1c2">1</td><td class="green" data-i18n="s3-r1c3">3 specialized roles</td></tr>
+      <tr><td data-i18n="s3-r2c1">Drive Model</td><td class="dim" data-i18n="s3-r2c2">User prompt -> Response</td><td class="green" data-i18n="s3-r2c3">Heartbeat-driven autonomous</td></tr>
+      <tr><td data-i18n="s3-r3c1">State</td><td class="dim" data-i18n="s3-r3c2">In-memory messages</td><td class="green" data-i18n="s3-r3c3">Git-based persistent</td></tr>
+      <tr><td data-i18n="s3-r4c1">Communication</td><td class="dim" data-i18n="s3-r4c2">None (single agent)</td><td class="green" data-i18n="s3-r4c3">Async mailbox</td></tr>
+      <tr><td data-i18n="s3-r5c1">Task Granularity</td><td class="dim" data-i18n="s3-r5c2">One-shot instruction</td><td class="green" data-i18n="s3-r5c3">Issue lifecycle</td></tr>
+      <tr><td data-i18n="s3-r6c1">Deliverable</td><td class="dim" data-i18n="s3-r6c2">Code files</td><td class="green" data-i18n="s3-r6c3">Complete product</td></tr>
     </table>
   </div>
 
   <!-- Slide 4: Three Agents -->
   <div class="slide">
-    <h2>Three Agent Roles</h2>
+    <h2 data-i18n="s4-title">Three Agent Roles</h2>
     <div class="cards">
       <div class="card pm">
-        <div class="card-title"><span class="highlight">PM Agent</span></div>
-        <div class="card-desc">Understands user intent. Breaks down requirements into Issues. Assigns, coordinates, and accepts deliverables. Makes product decisions.</div>
-        <div class="card-tools">Tools: create_issue, assign_task, check_progress, send_message, read_sop</div>
+        <div class="card-title"><span class="highlight" data-i18n="s4-pm-t">PM Agent</span></div>
+        <div class="card-desc" data-i18n="s4-pm-d">Understands user intent. Breaks down requirements into Issues. Assigns, coordinates, and accepts deliverables. Makes product decisions.</div>
+        <div class="card-tools" data-i18n="s4-pm-tools">Tools: create_issue, assign_task, check_progress, send_message, read_sop</div>
       </div>
       <div class="card eng">
-        <div class="card-title"><span class="green">Engineer Agent</span></div>
-        <div class="card-desc">Receives well-defined Issues. Writes code, runs tests, fixes bugs. Strictly executes within scope. Reports back on completion.</div>
-        <div class="card-tools">Tools: all 15 V5 tools + send_message, check_mailbox</div>
+        <div class="card-title"><span class="green" data-i18n="s4-eng-t">Engineer Agent</span></div>
+        <div class="card-desc" data-i18n="s4-eng-d">Receives well-defined Issues. Writes code, runs tests, fixes bugs. Strictly executes within scope. Reports back on completion.</div>
+        <div class="card-tools" data-i18n="s4-eng-tools">Tools: all 15 V5 tools + send_message, check_mailbox</div>
       </div>
       <div class="card strat">
-        <div class="card-title"><span class="orange">Strategist Agent</span></div>
-        <div class="card-desc">Writes README, docs, CHANGELOG. Focuses on product narrative and user experience. Scans for improvement opportunities.</div>
-        <div class="card-tools">Tools: file R/W + send_message, check_mailbox, web_search</div>
+        <div class="card-title"><span class="orange" data-i18n="s4-str-t">Strategist Agent</span></div>
+        <div class="card-desc" data-i18n="s4-str-d">Writes README, docs, CHANGELOG. Focuses on product narrative and user experience. Scans for improvement opportunities.</div>
+        <div class="card-tools" data-i18n="s4-str-tools">Tools: file R/W + send_message, check_mailbox, web_search</div>
       </div>
     </div>
   </div>
 
   <!-- Slide 5: Heartbeat -->
   <div class="slide">
-    <h2>Core Mechanism: Heartbeat</h2>
-    <p>Agents don't wait for instructions. They wake up, check state, and push forward.</p>
+    <h2 data-i18n="s5-title">Core Mechanism: Heartbeat</h2>
+    <p data-i18n="s5-desc">Agents don't wait for instructions. They wake up, check state, and push forward.</p>
     <div class="code"><span class="keyword">def</span> <span class="fn">tick</span>(self):
     <span class="comment"># Every agent runs this on a configurable interval</span>
     self.<span class="fn">git_pull</span>()              <span class="comment"># 1. Sync latest state</span>
@@ -272,13 +269,13 @@
     self.<span class="fn">check_tasks</span>()           <span class="comment"># 3. Check assigned issues</span>
     self.<span class="fn">execute_sop</span>()           <span class="comment"># 4. Follow role-specific SOP</span>
     self.<span class="fn">push_progress</span>()         <span class="comment"># 5. Commit & push updates</span></div>
-    <p style="margin-top: 20px;">The key phrase is <span class="green">"continue pushing forward"</span> -- agents find work to do, not wait for it.</p>
+    <p style="margin-top: 20px;" data-i18n="s5-note">The key phrase is <span class="green">"continue pushing forward"</span> -- agents find work to do, not wait for it.</p>
   </div>
 
   <!-- Slide 6: Shared Brain -->
   <div class="slide">
-    <h2>Git as Shared Brain</h2>
-    <p>All agents share state through a single Git repository. Persistent, auditable, human-readable.</p>
+    <h2 data-i18n="s6-title">Git as Shared Brain</h2>
+    <p data-i18n="s6-desc">All agents share state through a single Git repository. Persistent, auditable, human-readable.</p>
     <div class="code"><span class="string">project-repo/</span>
 <span class="string">.agent-team/</span>
   <span class="keyword">config.yaml</span>           <span class="comment"># Team config (roles, intervals)</span>
@@ -301,35 +298,35 @@
 
   <!-- Slide 7: Workflow -->
   <div class="slide">
-    <h2>How It Works</h2>
-    <h3>User: "I want to build a Todo App"</h3>
+    <h2 data-i18n="s7-title">How It Works</h2>
+    <h3 data-i18n="s7-sub">User: "I want to build a Todo App"</h3>
     <div class="flow">
-      <div class="flow-step pm-step">PM: Break into 5 Issues</div>
+      <div class="flow-step pm-step" data-i18n="s7-f1">PM: Break into 5 Issues</div>
       <div class="flow-arrow">--></div>
-      <div class="flow-step pm-step">Assign #1 #2 to Engineer</div>
+      <div class="flow-step pm-step" data-i18n="s7-f2">Assign #1 #2 to Engineer</div>
       <div class="flow-arrow">--></div>
-      <div class="flow-step eng-step">Engineer: Build project structure</div>
+      <div class="flow-step eng-step" data-i18n="s7-f3">Engineer: Build project structure</div>
     </div>
     <div class="flow" style="margin-top: 12px;">
-      <div class="flow-step eng-step">Engineer: Implement CRUD API</div>
+      <div class="flow-step eng-step" data-i18n="s7-f4">Engineer: Implement CRUD API</div>
       <div class="flow-arrow">--></div>
-      <div class="flow-step pm-step">PM: Accept & unblock #3 #4</div>
+      <div class="flow-step pm-step" data-i18n="s7-f5">PM: Accept & unblock #3 #4</div>
       <div class="flow-arrow">--></div>
-      <div class="flow-step eng-step">Engineer: Build frontend</div>
+      <div class="flow-step eng-step" data-i18n="s7-f6">Engineer: Build frontend</div>
     </div>
     <div class="flow" style="margin-top: 12px;">
-      <div class="flow-step strat-step">Strategist: Write README & docs</div>
+      <div class="flow-step strat-step" data-i18n="s7-f7">Strategist: Write README & docs</div>
       <div class="flow-arrow">--></div>
-      <div class="flow-step pm-step">PM: All 5 issues accepted</div>
+      <div class="flow-step pm-step" data-i18n="s7-f8">PM: All 5 issues accepted</div>
       <div class="flow-arrow">--></div>
-      <div class="flow-step" style="border-color: rgba(244,63,94,0.4); color: #fda4af;">Product delivered</div>
+      <div class="flow-step" style="border-color: rgba(244,63,94,0.4); color: #fda4af;" data-i18n="s7-f9">Product delivered</div>
     </div>
-    <p style="margin-top: 20px;">User goes to sleep. Wakes up to a working Todo App with documentation.</p>
+    <p style="margin-top: 20px;" data-i18n="s7-note">User goes to sleep. Wakes up to a working Todo App with documentation.</p>
   </div>
 
   <!-- Slide 8: User Experience -->
   <div class="slide">
-    <h2>User Experience</h2>
+    <h2 data-i18n="s8-title">User Experience</h2>
     <div class="code"><span class="comment"># Initialize a product team</span>
 $ <span class="keyword">agent-team</span> <span class="fn">init</span> <span class="string">"I want to build a personal blog with comments"</span>
 
@@ -354,12 +351,12 @@ $ <span class="keyword">agent-team</span> <span class="fn">chat</span> <span cla
 
   <!-- Slide 9: Implementation Plan -->
   <div class="slide">
-    <h2>Implementation Plan</h2>
+    <h2 data-i18n="s9-title">Implementation Plan</h2>
     <div class="timeline">
       <div class="phase">
         <div class="phase-title" style="color: #a5b4fc;">Phase 1</div>
         <div class="phase-items">
-          <strong>Infrastructure</strong><br>
+          <strong data-i18n="s9-p1-t">Infrastructure</strong><br>
           #1 Project structure<br>
           #2 Mailbox system<br>
           #3 Heartbeat driver<br>
@@ -372,7 +369,7 @@ $ <span class="keyword">agent-team</span> <span class="fn">chat</span> <span cla
       <div class="phase">
         <div class="phase-title" style="color: #86efac;">Phase 2</div>
         <div class="phase-items">
-          <strong>Agent Roles</strong><br>
+          <strong data-i18n="s9-p2-t">Agent Roles</strong><br>
           #7 PM Agent<br>
           #8 Engineer Agent<br>
           #9 Strategist Agent<br>
@@ -384,7 +381,7 @@ $ <span class="keyword">agent-team</span> <span class="fn">chat</span> <span cla
       <div class="phase">
         <div class="phase-title" style="color: #fdba74;">Phase 3</div>
         <div class="phase-items">
-          <strong>CLI & UX</strong><br>
+          <strong data-i18n="s9-p3-t">CLI & UX</strong><br>
           #11 CLI tool<br>
           #12 Default SOPs<br>
           #13 README & docs<br>
@@ -396,7 +393,7 @@ $ <span class="keyword">agent-team</span> <span class="fn">chat</span> <span cla
       <div class="phase">
         <div class="phase-title" style="color: #fda4af;">Phase 4</div>
         <div class="phase-items">
-          <strong>Evaluation</strong><br>
+          <strong data-i18n="s9-p4-t">Evaluation</strong><br>
           #15 Team eval framework<br>
           #16 E2E demo<br>
           <br><br><br><br>
@@ -404,14 +401,14 @@ $ <span class="keyword">agent-team</span> <span class="fn">chat</span> <span cla
         </div>
       </div>
     </div>
-    <p style="margin-top: 24px;">16 Issues | 4 Phases | 2 engineers (Kira + Luca)</p>
+    <p style="margin-top: 24px;" data-i18n="s9-summary">16 Issues | 4 Phases | 2 engineers (Kira + Luca)</p>
   </div>
 
   <!-- Slide 10: Closing -->
   <div class="slide">
-    <h1>V5 taught agents to code.</h1>
-    <h1><span class="green">V6 teaches agents to ship products.</span></h1>
-    <p class="tagline" style="margin-top: 32px;">"Describe your product. Your AI team builds it."</p>
+    <h1 data-i18n="s10-t1">V5 taught agents to code.</h1>
+    <h1><span class="green" data-i18n="s10-t2">V6 teaches agents to ship products.</span></h1>
+    <p class="tagline" style="margin-top: 32px;" data-i18n="s10-tag">"Describe your product. Your AI team builds it."</p>
     <div style="margin-top: 48px; display: flex; gap: 32px; font-size: 0.9rem; color: #475569;">
       <div>PM: Zoey</div>
       <div>Tech: Kira</div>
@@ -428,6 +425,88 @@ $ <span class="keyword">agent-team</span> <span class="fn">chat</span> <span cla
 </div>
 
 <script>
+/* --- i18n --- */
+const T = {
+  zh: {
+    's1-t1': '构建我的编程智能体',
+    's1-t2': 'V6 — 智能体团队',
+    's1-sub': '从单兵编码到产品团队',
+    's1-tag': '"描述你的产品，AI 团队帮你构建。"',
+    's1-credit': '产品负责人：Zoey | 2026-03-02',
+    's2-title': 'V0 到 V6：演进之路',
+    's2-desc': '从 33 行 Bash 脚本到多智能体产品团队。',
+    's2-legend': '<span class="dim">V0-V1</span> 脚本 | <span class="dim">V2-V3</span> 工具系统 | <span class="highlight">V4</span> 子智能体 | <span class="highlight">V5</span> 评估体系 | <span class="green">V6</span> 智能体团队',
+    's3-title': '问题',
+    's3-sub': '现有编程智能体都是单兵作战。',
+    's3-th1': '维度', 's3-th2': 'V5（单智能体）', 's3-th3': 'V6（团队）',
+    's3-r1c1': '智能体数量', 's3-r1c2': '1', 's3-r1c3': '3 个专业角色',
+    's3-r2c1': '驱动模式', 's3-r2c2': '用户指令 -> 响应', 's3-r2c3': '心跳驱动自治',
+    's3-r3c1': '状态管理', 's3-r3c2': '内存中的消息', 's3-r3c3': '基于 Git 的持久化',
+    's3-r4c1': '通信方式', 's3-r4c2': '无（单智能体）', 's3-r4c3': '异步信箱',
+    's3-r5c1': '任务粒度', 's3-r5c2': '一次性指令', 's3-r5c3': 'Issue 生命周期',
+    's3-r6c1': '交付物', 's3-r6c2': '代码文件', 's3-r6c3': '完整产品',
+    's4-title': '三个智能体角色',
+    's4-pm-t': 'PM 智能体',
+    's4-pm-d': '理解用户意图，将需求拆解为 Issue，分配、协调、验收交付物，做产品决策。',
+    's4-pm-tools': '工具：create_issue, assign_task, check_progress, send_message, read_sop',
+    's4-eng-t': '工程师智能体',
+    's4-eng-d': '接收定义明确的 Issue，编写代码、运行测试、修复 Bug，严格在范围内执行，完成后汇报。',
+    's4-eng-tools': '工具：V5 全部 15 个工具 + send_message, check_mailbox',
+    's4-str-t': '策略师智能体',
+    's4-str-d': '撰写 README、文档、CHANGELOG，关注产品叙事和用户体验，主动扫描改进机会。',
+    's4-str-tools': '工具：文件读写 + send_message, check_mailbox, web_search',
+    's5-title': '核心机制：心跳',
+    's5-desc': '智能体不等指令。它们自动唤醒、检查状态、推动进度。',
+    's5-note': '关键词是 <span class="green">"持续推进"</span> —— 智能体主动找活干，而不是等着被安排。',
+    's6-title': 'Git 作为共享大脑',
+    's6-desc': '所有智能体通过同一个 Git 仓库共享状态。持久化、可审计、人类可读。',
+    's7-title': '工作流程',
+    's7-sub': '用户："我想做一个 Todo App"',
+    's7-f1': 'PM：拆解为 5 个 Issue',
+    's7-f2': '分配 #1 #2 给工程师',
+    's7-f3': '工程师：搭建项目结构',
+    's7-f4': '工程师：实现 CRUD API',
+    's7-f5': 'PM：验收通过，解锁 #3 #4',
+    's7-f6': '工程师：构建前端',
+    's7-f7': '策略师：撰写 README 和文档',
+    's7-f8': 'PM：全部 5 个 Issue 验收通过',
+    's7-f9': '产品交付',
+    's7-note': '用户去睡觉，醒来发现一个可运行的 Todo App 和完整文档。',
+    's8-title': '用户体验',
+    's9-title': '实施计划',
+    's9-p1-t': '基础设施', 's9-p2-t': '智能体角色', 's9-p3-t': 'CLI 和体验', 's9-p4-t': '评估验证',
+    's9-summary': '16 个 Issue | 4 个阶段 | 2 位工程师（Kira + Luca）',
+    's10-t1': 'V5 教会了智能体写代码。',
+    's10-t2': 'V6 教会了智能体交付产品。',
+    's10-tag': '"描述你的产品，AI 团队帮你构建。"'
+  }
+};
+
+let lang = 'en';
+const enCache = {};
+
+function toggleLang() {
+  if (lang === 'en') {
+    // Save EN text, switch to ZH
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      enCache[key] = el.innerHTML;
+      if (T.zh[key]) el.innerHTML = T.zh[key];
+    });
+    lang = 'zh';
+    document.getElementById('langBtn').textContent = 'EN';
+  } else {
+    // Restore EN text
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (enCache[key]) el.innerHTML = enCache[key];
+    });
+    lang = 'en';
+    document.getElementById('langBtn').textContent = 'ZH';
+  }
+}
+
+/* --- Slide navigation --- */
 let current = 0;
 const slides = document.querySelectorAll('.slide');
 const total = slides.length;
