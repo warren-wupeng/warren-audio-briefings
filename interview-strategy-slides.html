@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联想面试 · 作战手册 — Warren Wu</title>
+<style>
+  @import url('data:text/css,');
+
+  :root {
+    --bg: #070c1a;
+    --bg2: #0d1526;
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.15);
+    --blue-border: rgba(59,130,246,0.35);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.12);
+    --amber-border: rgba(245,158,11,0.35);
+    --white: #f0f4ff;
+    --dim: rgba(240,244,255,0.55);
+    --dimmer: rgba(240,244,255,0.3);
+    --grid-line: rgba(59,130,246,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', -apple-system, sans-serif;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Ambient glow */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(59,130,246,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(245,158,11,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Slides container */
+  #deck {
+    position: fixed; inset: 0;
+    z-index: 1;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 64px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(60px);
+    transition: opacity 0.45s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
+  }
+  .slide.exit-left {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  /* Slide inner container */
+  .slide-inner {
+    width: 100%;
+    max-width: 900px;
+  }
+
+  /* Slide label */
+  .slide-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 14px;
+    opacity: 0.9;
+  }
+
+  /* Titles */
+  h1.title {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+  h2.slide-title {
+    font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    margin-bottom: 28px;
+  }
+  h2.slide-title .accent { color: var(--amber); }
+
+  /* Divider line */
+  .divider {
+    width: 48px; height: 3px;
+    background: linear-gradient(90deg, var(--blue), var(--amber));
+    border-radius: 2px;
+    margin: 16px 0 24px;
+  }
+
+  /* ——— SLIDE 1 ——— */
+  #s1 { text-align: center; }
+  #s1 .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  #s1 h1.title {
+    background: linear-gradient(135deg, var(--white) 40%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  #s1 .subtitle {
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    color: var(--dim);
+    font-weight: 400;
+    margin-bottom: 32px;
+  }
+  #s1 .meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  #s1 .meta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  #s1 .tag-date { background: var(--blue-dim); border: 1px solid var(--blue-border); color: var(--blue); }
+  #s1 .tag-luca { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); }
+  #s1 .key-hint {
+    margin-top: 44px;
+    font-size: 0.7rem;
+    color: var(--dimmer);
+    letter-spacing: 0.08em;
+  }
+  #s1 .key-hint span { display: inline-block; padding: 2px 8px; background: rgba(255,255,255,0.07); border-radius: 4px; margin: 0 2px; }
+
+  /* ——— SLIDE 2 ——— */
+  #s2 .big-quote {
+    font-size: clamp(1.1rem, 2.8vw, 1.65rem);
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1.4;
+    margin-bottom: 28px;
+    padding: 20px 24px;
+    background: var(--amber-dim);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 8px 8px 0;
+  }
+  #s2 .timeline-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+  .tl-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .tl-year {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--blue);
+  }
+  .tl-bubble {
+    width: 10px; height: 10px;
+    background: var(--blue);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--blue);
+  }
+  .tl-label {
+    font-size: 0.78rem;
+    color: var(--dim);
+    text-align: center;
+    max-width: 90px;
+  }
+  .tl-arrow {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue-border), transparent);
+    align-self: flex-start;
+    margin-top: 17px;
+    min-width: 40px;
+  }
+  #s2 .closing {
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+    color: var(--white);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  #s2 .note-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    font-size: 0.76rem;
+    color: var(--dimmer);
+    font-style: italic;
+  }
+
+  /* ——— TIMELINE slides (Slide 3) ——— */
+  .timeline-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .tl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 18px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+  .tl-item:hover { border-color: var(--blue-border); }
+  .tl-year-badge {
+    flex-shrink: 0;
+    min-width: 52px;
+    padding: 3px 10px;
+    background: var(--blue-dim);
+    border: 1px solid var(--blue-border);
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+  .tl-year-badge.amber-badge {
+    background: var(--amber-dim);
+    border-color: var(--amber-border);
+    color: var(--amber);
+  }
+  .tl-item-content { font-size: 0.88rem; color: var(--white); line-height: 1.5; }
+  .tl-item-content .bold { font-weight: 700; }
+  .tl-item-content .dim { color: var(--dim); font-size: 0.82rem; }
+  .closing-line {
+    margin-top: 16px;
+    padding: 12px 18px;
+    background: linear-gradient(90deg, rgba(59,130,246,0.1), rgba(245,158,11,0.08));
+    border-left: 3px solid var(--blue);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  /* ——— Phase roadmap (Slide 4) ——— */
+  .key-insight {
+    font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+    font-weight: 700;
+    color: var(--amber);
+    padding: 12px 18px;
+    background: var(--amber-dim);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 22px;
+  }
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .phase-card {
+    padding: 16px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .phase-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--amber));
+  }
+  .phase-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--blue);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .phase-title { font-size: 0.85rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .phase-body { font-size: 0.76rem; color: var(--dim); line-height: 1.6; }
+  .security-note {
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    font-size: 0.76rem;
+    color: var(--dimmer);
+  }
+  .security-note span { color: var(--amber); font-weight: 600; }
+
+  /* ——— Two column (Slides 5, 6) ——— */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .col-card {
+    padding: 20px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+  }
+  .col-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .col-label.blue { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
+  .col-label.amber { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+  .col-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .col-list li {
+    font-size: 0.83rem;
+    color: var(--dim);
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+  }
+  .col-list li::before {
+    content: '—';
+    position: absolute; left: 0;
+    color: var(--blue);
+    font-weight: 700;
+  }
+  .col-list li.amber-bullet::before { color: var(--amber); }
+  .col-list li .bold { color: var(--white); font-weight: 600; }
+  .col-list li .amber-text { color: var(--amber); font-weight: 600; }
+  .bottom-note-row {
+    margin-top: 18px;
+    padding: 10px 16px;
+    background: var(--blue-dim);
+    border: 1px solid var(--blue-border);
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: var(--white);
+  }
+  .bottom-note-row span { color: var(--amber); font-weight: 700; }
+
+  /* ——— Compliance slide (7) ——— */
+  .dual-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+  .compliance-box {
+    padding: 18px 20px;
+    border-radius: 10px;
+    border: 1px solid;
+  }
+  .compliance-box.overseas {
+    background: var(--blue-dim);
+    border-color: var(--blue-border);
+  }
+  .compliance-box.domestic {
+    background: var(--amber-dim);
+    border-color: var(--amber-border);
+  }
+  .comp-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .overseas .comp-label { color: var(--blue); }
+  .domestic .comp-label { color: var(--amber); }
+  .comp-models {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .comp-env {
+    font-size: 0.76rem;
+    color: var(--dim);
+  }
+  .arch-note {
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.83rem;
+    color: var(--white);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .tom-note {
+    font-size: 0.73rem;
+    color: var(--dimmer);
+    font-style: italic;
+    padding: 8px 14px;
+    border-left: 2px solid var(--amber-border);
+  }
+
+  /* ——— Why Lenovo (8) ——— */
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 14px; margin-bottom: 16px; }
+  .why-card {
+    padding: 16px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+  }
+  .why-card-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .why-card.verified .why-card-label { color: var(--blue); }
+  .why-card.verify .why-card-label { color: var(--amber); }
+  .why-card.rare .why-card-label { color: #a78bfa; }
+  .why-card-body { font-size: 0.8rem; color: var(--dim); line-height: 1.6; }
+  .personal-line {
+    padding: 12px 18px;
+    border-left: 3px solid var(--amber-border);
+    font-size: 0.83rem;
+    color: var(--amber);
+    font-style: italic;
+    line-height: 1.6;
+    background: var(--amber-dim);
+    border-radius: 0 6px 6px 0;
+  }
+
+  /* ——— Collaboration (9) ——— */
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .step-item {
+    display: flex;
+    gap: 18px;
+    padding: 16px 20px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+  .step-item:hover { border-color: var(--blue-border); }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--blue), #1d4ed8);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 1px;
+    box-shadow: 0 0 12px rgba(59,130,246,0.4);
+  }
+  .step-content { flex: 1; }
+  .step-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .step-body { font-size: 0.8rem; color: var(--dim); line-height: 1.5; }
+
+  /* ——— Numbers grid (10) ——— */
+  .numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .num-card {
+    padding: 18px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    text-align: center;
+    transition: border-color 0.25s, transform 0.2s;
+  }
+  .num-card:hover { border-color: var(--amber-border); transform: translateY(-2px); }
+  .num-big {
+    font-size: clamp(1.4rem, 3vw, 2.1rem);
+    font-weight: 900;
+    color: var(--amber);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .num-label {
+    font-size: 0.74rem;
+    color: var(--dim);
+    line-height: 1.4;
+  }
+
+  /* ——— Questions (11) ——— */
+  .q-list { display: flex; flex-direction: column; gap: 16px; }
+  .q-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px 18px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    align-items: flex-start;
+  }
+  .q-badge {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .q-badge.q1 { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); }
+  .q-badge.q2 { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+  .q-badge.q3 { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+  .q-text { font-size: 0.84rem; color: var(--white); line-height: 1.6; }
+  .q-sub { font-size: 0.72rem; color: var(--dim); margin-top: 3px; }
+
+  /* ——— Checklist (12) ——— */
+  .checklist { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .check-item:hover { border-color: var(--blue-border); }
+  .check-item.done {
+    background: rgba(59,130,246,0.07);
+    border-color: var(--blue-border);
+  }
+  .check-box {
+    width: 20px; height: 20px;
+    border: 2px solid var(--blue-border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .check-item.done .check-box {
+    background: var(--blue);
+    border-color: var(--blue);
+  }
+  .check-item.done .check-box::after {
+    content: '✓';
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .check-text { font-size: 0.83rem; color: var(--dim); flex: 1; line-height: 1.4; }
+  .check-item.done .check-text { color: var(--white); }
+  .check-text .highlight { color: var(--amber); font-weight: 600; }
+  .kudos {
+    text-align: center;
+    padding: 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--amber);
+    letter-spacing: 0.05em;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 16px;
+    pointer-events: none;
+  }
+
+  /* ——— UI chrome ——— */
+  #nav-dots {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 7px;
+    z-index: 100;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .dot.active {
+    background: var(--blue);
+    transform: scale(1.4);
+    box-shadow: 0 0 8px var(--blue);
+  }
+
+  #slide-counter {
+    position: fixed;
+    bottom: 24px; right: 32px;
+    font-size: 0.7rem;
+    color: var(--dimmer);
+    letter-spacing: 0.1em;
+    z-index: 100;
+    font-variant-numeric: tabular-nums;
+  }
+  #slide-counter .current { color: var(--white); font-weight: 700; }
+
+  #prev-btn, #next-btn {
+    position: fixed;
+    top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: background 0.2s, border-color 0.2s;
+    color: var(--dim);
+    font-size: 1.1rem;
+  }
+  #prev-btn { left: 20px; }
+  #next-btn { right: 20px; }
+  #prev-btn:hover, #next-btn:hover {
+    background: var(--blue-dim);
+    border-color: var(--blue-border);
+    color: var(--blue);
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .slide { padding: 32px 24px; }
+    .phase-grid, .two-col, .three-col, .dual-box, .numbers-grid {
+      grid-template-columns: 1fr;
+    }
+    #prev-btn, #next-btn { display: none; }
+    #s1 h1.title { font-size: 2.2rem; }
+    .num-big { font-size: 1.6rem; }
+  }
+  @media (max-width: 480px) {
+    .slide { padding: 24px 16px; }
+    h2.slide-title { font-size: 1.4rem; margin-bottom: 18px; }
+    .numbers-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Touch swipe hint */
+  .swipe-hint {
+    display: none;
+  }
+  @media (hover: none) {
+    .swipe-hint { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide" id="s1">
+    <div class="slide-inner" style="text-align:center">
+      <div class="eyebrow">Interview · War Room</div>
+      <h1 class="title">联想面试<br>作战手册</h1>
+      <p class="subtitle">Data Product Manager — 数据分析 Agent</p>
+      <div class="meta-row">
+        <span class="meta-tag tag-date">📅 2026-03-02 周一 09:00</span>
+        <span class="meta-tag tag-luca">✦ Luca 出品</span>
+      </div>
+      <div class="key-hint" style="margin-top:40px">
+        <span>←</span> <span>→</span> 方向键翻页 · 点击右侧翻下一页
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Narrative -->
+  <div class="slide" id="s2">
+    <div class="slide-inner">
+      <div class="slide-label">Core Narrative</div>
+      <h2 class="slide-title">全场叙事主线 <span class="accent">（背下来）</span></h2>
+      <div class="big-quote">
+        "我在每一波 AI 浪潮里都是第一批做产品的人"
+      </div>
+      <div class="timeline-row">
+        <div class="tl-node">
+          <div class="tl-year">2023</div>
+          <div class="tl-bubble"></div>
+          <div class="tl-label">ChatGPT</div>
+        </div>
+        <div class="tl-arrow"></div>
+        <div class="tl-node">
+          <div class="tl-year">2024</div>
+          <div class="tl-bubble"></div>
+          <div class="tl-label">Coding</div>
+        </div>
+        <div class="tl-arrow"></div>
+        <div class="tl-node">
+          <div class="tl-year">2026</div>
+          <div class="tl-bubble" style="background:var(--amber);box-shadow:0 0 10px var(--amber)"></div>
+          <div class="tl-label">Agent</div>
+        </div>
+      </div>
+      <p class="closing">联想要做数据分析 Agent，我已经用 <strong style="color:var(--amber)">5 天</strong>做出了 MVP——<strong>这就是我来这里的原因。</strong></p>
+      <div class="note-tag">让面试官记住：这个人不是在追风口，他一直在风口上</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Scene 1 -->
+  <div class="slide" id="s3">
+    <div class="slide-inner">
+      <div class="slide-label">Scene 1</div>
+      <h2 class="slide-title">场景 1 · 自我介绍</h2>
+      <ul class="timeline-list">
+        <li class="tl-item">
+          <span class="tl-year-badge">2023</span>
+          <div class="tl-item-content">
+            <span class="bold">ChatGPT 大火</span>
+            <span class="dim"> → AI 聊天机器人 + RAG 图片笔记应用（OpenAI API）</span>
+          </div>
+        </li>
+        <li class="tl-item">
+          <span class="tl-year-badge">2024</span>
+          <div class="tl-item-content">
+            <span class="bold">Claude Sonnet 3.5</span>
+            <span class="dim"> → Vibe Coding 建站工具（让普通非程序员用户也能做网站）</span>
+          </div>
+        </li>
+        <li class="tl-item">
+          <span class="tl-year-badge" style="min-width:52px">2026</span>
+          <div class="tl-item-content">
+            <span class="bold">OpenClaw</span>
+            <span class="dim"> → </span>
+            <span class="bold">HappyCapy</span>
+            <span style="color:var(--amber);font-weight:600"> 19天 · 1万沙盒 · 55个年费用户 · $2000/年</span>
+          </div>
+        </li>
+        <li class="tl-item">
+          <span class="tl-year-badge amber-badge">投名状</span>
+          <div class="tl-item-content">
+            <span class="bold">5天工作之余</span>
+            <span class="dim">，做出了数据分析 Agent MVP — <span style="color:var(--amber)">可以现场演示</span></span>
+          </div>
+        </li>
+      </ul>
+      <div class="closing-line">→ 我认为自己是非常适合这个数据分析产品经理岗位的人选</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Scene 2 -->
+  <div class="slide" id="s4">
+    <div class="slide-inner">
+      <div class="slide-label">Scene 2 · 主动展示</div>
+      <h2 class="slide-title">场景 2 · 产品方案</h2>
+      <div class="key-insight">难点不在调 API 生成 SQL，难点在<strong>上下文</strong></div>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <div class="phase-num">Phase 1</div>
+          <div class="phase-title">双环境并行启动</div>
+          <div class="phase-body">Azure Databricks Genie + LUDP Spark/Trino<br>统一语义层 · 种子团队 50 个核心查询 · 置信度标签</div>
+        </div>
+        <div class="phase-card">
+          <div class="phase-num">Phase 2</div>
+          <div class="phase-title">记忆与反馈闭环</div>
+          <div class="phase-body">V4 对话压缩引擎<br>节省 40-60% token · 置信度分级 · 跨平台统一纠错</div>
+        </div>
+        <div class="phase-card">
+          <div class="phase-num">Phase 3</div>
+          <div class="phase-title">按需多 Agent 架构</div>
+          <div class="phase-body">根据验证出的真实需求决定<br>私有环境可用开源方案<br>不绑定单一平台</div>
+        </div>
+      </div>
+      <div class="security-note">
+        <span>安全底线</span> — pass-through 模式，Agent 继承用户权限 · Unity Catalog / LUDP Catalog 双轨权限透传 · 统一审计日志
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Scene 3 -->
+  <div class="slide" id="s5">
+    <div class="slide-inner">
+      <div class="slide-label">Scene 3</div>
+      <h2 class="slide-title">场景 3 · 数据平台 <span class="accent">（坦诚有框架）</span></h2>
+      <div class="two-col">
+        <div class="col-card">
+          <span class="col-label blue">我有</span>
+          <ul class="col-list">
+            <li><span class="bold">底层认知</span>（读过 DDIA）</li>
+            <li><span class="bold">DDD + CQRS + Event Sourcing</span> 架构经验</li>
+            <li>理解数据从采集到消费的<span class="bold">全链路设计</span></li>
+            <li>事件溯源与数据流<span class="bold">概念相通</span></li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <span class="col-label amber">我带来</span>
+          <ul class="col-list">
+            <li class="amber-bullet"><span class="amber-text">如何在现有数据基础设施上构建 Agent 产品</span>（这是新问题）</li>
+            <li class="amber-bullet">coding agent <span class="bold">从零到生产</span>的完整过程</li>
+            <li class="amber-bullet">团队里大概<span class="bold">还没有人做过</span>，而我做过</li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom-note-row">
+        <span>3,700+</span> GitHub 贡献 · 学习方式："拿到环境直接动手"，不看文档——边学边做
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Scene 4 -->
+  <div class="slide" id="s6">
+    <div class="slide-inner">
+      <div class="slide-label">Scene 4</div>
+      <h2 class="slide-title">场景 4 · AI 工具经验 <span class="accent">（使用 + 构建）</span></h2>
+      <div class="two-col">
+        <div class="col-card">
+          <span class="col-label blue">使用层面</span>
+          <ul class="col-list">
+            <li><span class="bold">Cursor + Claude Code</span> 日常开发</li>
+            <li>后端系统 <span class="bold">60% 代码</span> AI 辅助完成</li>
+            <li>清楚 AI 边界：<span class="bold">架构决策它做不了</span>，复杂业务逻辑它经常错</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <span class="col-label amber">构建层面 — coding agent 5版</span>
+          <ul class="col-list">
+            <li class="amber-bullet"><span class="bold">V0-V2</span>：解决「Agent 怎么调用工具」</li>
+            <li class="amber-bullet"><span class="bold">V3</span>：完整 OOP 重构（<span class="amber-text">33行→9,266行</span>）</li>
+            <li class="amber-bullet"><span class="bold">V4</span>：sub-agent 委派，成功率 <span class="amber-text">60%→85%</span>，对话压缩节省 <span class="amber-text">40-60%</span> token</li>
+            <li class="amber-bullet"><span class="bold">V5</span>：SWE-bench 评估框架</li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom-note-row">
+        <span>5 家 LLM Provider</span> 统一抽象层 — OpenAI / Anthropic / Gemini / DeepSeek / Mistral · 上层 Agent 逻辑不感知底层
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Scene 4.5 -->
+  <div class="slide" id="s7">
+    <div class="slide-inner">
+      <div class="slide-label">Scene 4.5 · 国内合规</div>
+      <h2 class="slide-title">合规是<span class="accent">设计约束</span>，不是限制</h2>
+      <div class="key-insight">方案设计从第一天就是<strong>双版本</strong></div>
+      <div class="dual-box">
+        <div class="compliance-box overseas">
+          <div class="comp-label">海外</div>
+          <div class="comp-models">Claude / GPT</div>
+          <div class="comp-env">Azure 环境 · 海外业务 Agent</div>
+        </div>
+        <div class="compliance-box domestic">
+          <div class="comp-label">国内</div>
+          <div class="comp-models">Qwen / GLM / Kimi 2.5</div>
+          <div class="comp-env">联想内部已有模型服务 · 国内业务 Agent</div>
+        </div>
+      </div>
+      <div class="arch-note">
+        Agent 逻辑与 LLM Provider <strong>完全解耦</strong>——换底层模型是配置变更，不是代码重写。数据分析场景对模型的核心要求是 Text-to-SQL 和语义理解，国内模型现在都能做到生产水准。
+      </div>
+      <div class="tom-note">
+        Tom 微信确认（2026-02-27）：联想内部有 Qwen / GLM / Kimi 2.5 可用，国外项目用 Claude / GPT。"只要有可见的价值这些问题都可以解决。"
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Scene 5 -->
+  <div class="slide" id="s8">
+    <div class="slide-inner">
+      <div class="slide-label">Scene 5</div>
+      <h2 class="slide-title">场景 5 · 为什么来联想</h2>
+      <div class="three-col">
+        <div class="why-card verified">
+          <span class="why-card-label">已验证</span>
+          <div class="why-card-body">HappyCapy <strong>19天</strong> 交付 <strong>1万沙盒</strong>、<strong>55个年费用户</strong><br><br>Agent 能商业化 ✓</div>
+        </div>
+        <div class="why-card verify">
+          <span class="why-card-label">想验证</span>
+          <div class="why-card-body">同样的 Agent 能力，放到<strong>大型企业跨部门、跨系统的业务数据</strong>上，能不能跑起来？</div>
+        </div>
+        <div class="why-card rare">
+          <span class="why-card-label">联想的稀缺性</span>
+          <div class="why-card-body">全球化业务数据 + 双环境数据平台（Azure + 沈阳 LUDP）+ 路线图<strong>明确写了</strong>「数据分析智能体」</div>
+        </div>
+      </div>
+      <div class="personal-line">
+        "Tom 是我非常信任的前领导。他说这个团队需要能把 Agent 落地的人——我就是在做这件事。"
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: Scene 6 -->
+  <div class="slide" id="s9">
+    <div class="slide-inner">
+      <div class="slide-label">Scene 6</div>
+      <h2 class="slide-title">场景 6 · 跨团队协作</h2>
+      <div class="steps">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">学习</div>
+            <div class="step-body">先花 1-2 周只做三件事：<strong>看现有代码、听老人讲历史、找到切入点</strong>。数据工程师对表关系、数据血缘、口径定义的理解比我深，这些是我需要快速吸收的。</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Demo</div>
+            <div class="step-body">找团队公认的痛点——比如某个<strong>高频报表查询</strong>——用 Agent 做一个能跑的 demo。让团队看到具体效果，效果好了自然有人跟进。</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">定位</div>
+            <div class="step-body">Agent 是数据工程师的<strong>放大器，不是替代品</strong>。它把重复的 SQL 编写和数据查找自动化，让工程师专注在架构设计和数据治理上。这个定位<strong>第一天就讲清楚</strong>。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: Numbers -->
+  <div class="slide" id="s10">
+    <div class="slide-inner">
+      <div class="slide-label">Trust Anchors</div>
+      <h2 class="slide-title">关键数字速查 <span class="accent">（信任锚点）</span></h2>
+      <div class="numbers-grid">
+        <div class="num-card">
+          <div class="num-big">19天</div>
+          <div class="num-label">HappyCapy 上线时间</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">1万</div>
+          <div class="num-label">用户专属沙盒</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">55</div>
+          <div class="num-label">$2000 年费订阅用户</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">5天</div>
+          <div class="num-label">工作之余做出 Data Agent MVP</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">9,266行</div>
+          <div class="num-label">coding agent（从 33 行起步）</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">60%→85%</div>
+          <div class="num-label">V4 sub-agent 成功率提升</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">40-60%</div>
+          <div class="num-label">V4 对话压缩节省 token</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">3,700+</div>
+          <div class="num-label">一年 GitHub 贡献次数</div>
+        </div>
+        <div class="num-card">
+          <div class="num-big">5家</div>
+          <div class="num-label">LLM Provider 统一接入</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: Questions -->
+  <div class="slide" id="s11">
+    <div class="slide-inner">
+      <div class="slide-label">Counter Questions</div>
+      <h2 class="slide-title">你要问他们的问题 <span class="accent">（准备 2-3 个）</span></h2>
+      <div class="q-list">
+        <div class="q-item">
+          <span class="q-badge q1">展示架构认知</span>
+          <div>
+            <div class="q-text">"联想是双环境架构——Databricks 做 Corporate EDW，LUDP 管域级数据。路线图里写了数据分析智能体。这个 Agent 产品目前是从哪一侧先启动？优先 Databricks，还是双环境同步推进？"</div>
+          </div>
+        </div>
+        <div class="q-item">
+          <span class="q-badge q2">了解起点</span>
+          <div>
+            <div class="q-text">"数据分析 Agent 这个方向，团队现在有没有已经在做的尝试或者 POC？"</div>
+          </div>
+        </div>
+        <div class="q-item">
+          <span class="q-badge q3">让他说出痛点</span>
+          <div>
+            <div class="q-text">"Tom 提到这个岗位希望给团队带来新思路，在您看来，团队目前最需要突破的瓶颈是什么？"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: Checklist -->
+  <div class="slide" id="s12">
+    <div class="slide-inner">
+      <div class="slide-label">D-Day Checklist</div>
+      <h2 class="slide-title">面试当天 Checklist</h2>
+      <div class="checklist" id="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div class="check-text">提前 10 分钟到达/上线</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div class="check-text">准备好自我介绍（中英文各一版）</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div class="check-text">GitHub 主页打开，<span class="highlight">build-my-own-coding-agent</span> 随时可展示</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div class="check-text"><span class="highlight">Tab 6</span>: data-analysis-agent-warren.fly.dev/ 确认能打开</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div class="check-text">心中能白板画出：<span class="highlight">产品方案三阶段 + 上下文分层思路</span></div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div class="check-text">准备 2-3 个反问（已在 Slide 11）</div>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div class="check-text">着装：business casual（不需要西装）</div>
+        </div>
+      </div>
+      <div class="kudos">加油 Warren ✦ Zoey &amp; Luca &amp; Kira</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- UI chrome -->
+<div id="nav-dots"></div>
+<div id="slide-counter"><span class="current" id="cur">1</span> / <span id="total">12</span></div>
+<div id="prev-btn" onclick="navigate(-1)">‹</div>
+<div id="next-btn" onclick="navigate(1)">›</div>
+
+<script>
+  const TOTAL = 12;
+  let current = 1;
+  let animating = false;
+
+  // Build dots
+  const dotsEl = document.getElementById('nav-dots');
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    if (animating || n === current || n < 1 || n > TOTAL) return;
+    animating = true;
+    const prev = document.getElementById('s' + current);
+    const next = document.getElementById('s' + n);
+    const dir = n > current ? 1 : -1;
+
+    // Exit current
+    prev.classList.remove('active');
+    prev.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
+
+    // Prepare next
+    next.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+    next.style.opacity = '0';
+    next.style.transition = 'none';
+    next.classList.add('active');
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        next.style.transition = '';
+        next.style.transform = '';
+        next.style.opacity = '';
+        setTimeout(() => {
+          prev.classList.remove('exit-left', 'exit-right');
+          animating = false;
+        }, 450);
+      });
+    });
+
+    // Update dots
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i + 1 === n);
+    });
+    document.getElementById('cur').textContent = n;
+    current = n;
+  }
+
+  function navigate(dir) { goTo(current + dir); }
+
+  // Show first slide
+  document.getElementById('s1').classList.add('active');
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); navigate(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); navigate(-1); }
+  });
+
+  // Click deck to advance (except interactive elements)
+  document.getElementById('deck').addEventListener('click', e => {
+    if (e.target.closest('.check-item') || e.target.closest('#prev-btn') || e.target.closest('#next-btn') || e.target.closest('#nav-dots')) return;
+    if (e.clientX > window.innerWidth * 0.25) navigate(1);
+    else navigate(-1);
+  });
+
+  // Touch swipe
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+
+  // Checklist
+  function toggleCheck(el) {
+    el.classList.toggle('done');
+    event.stopPropagation();
+  }
+</script>
+</body>
+</html>
