@@ -158,11 +158,12 @@
     .phase-title { font-size: 0.78rem; margin-bottom: 6px; }
     .phase-items { font-size: 0.78rem; line-height: 1.7; }
 
-    /* Chart: scale bars to 55% on mobile */
-    .versions { height: 110px; gap: 6px; margin-top: 16px; justify-content: center; }
-    .ver-fill { width: 30px; height: calc(var(--h) * 0.55px); }
+    /* Chart: auto height + scale bars to 45% on mobile */
+    .versions { height: auto; gap: 6px; margin-top: 16px; justify-content: center; }
+    .ver-fill { width: 30px; height: calc(var(--h) * 0.45px); }
     .ver-label { font-size: 0.65rem; }
     .ver-num { font-size: 0.6rem; }
+    .ver-bar { gap: 4px; }
 
     .feature-list li { font-size: 0.88rem; padding: 8px 0; }
 
@@ -180,8 +181,8 @@
     h1 { font-size: 1.35rem; }
     h2 { font-size: 1.1rem; }
     .code { font-size: 0.65rem; padding: 10px; }
-    .ver-fill { width: 24px; height: calc(var(--h) * 0.45px); }
-    .versions { height: 90px; }
+    .ver-fill { width: 22px; height: calc(var(--h) * 0.35px); }
+    .versions { height: auto; }
     .card { padding: 12px; }
   }
 </style>
