@@ -31,24 +31,26 @@ body{
   background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.5) 40%,transparent 100%);
 }
 
-/* Header */
+/* Header — positioned at bottom of photo spacer, not overlapping face */
 .header{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  padding:env(safe-area-inset-top) 0 0;
+  position:absolute;bottom:0;left:0;right:0;z-index:200;
+  pointer-events:none;
 }
 .header-inner{
   max-width:480px;margin:0 auto;
   display:flex;align-items:center;gap:10px;
-  height:52px;padding:0 16px;
+  height:48px;padding:0 18px;
+  pointer-events:auto;
 }
 .header-avatar{
-  width:36px;height:36px;border-radius:50%;overflow:hidden;
-  border:2px solid rgba(255,255,255,.3);flex-shrink:0;
+  width:34px;height:34px;border-radius:50%;overflow:hidden;
+  border:2px solid rgba(255,255,255,.25);flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
 }
 .header-avatar img{width:100%;height:100%;object-fit:cover}
 .header-info{flex:1}
-.header-name{font-size:1rem;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
-.header-tag{font-size:.68rem;color:rgba(255,255,255,.6)}
+.header-name{font-size:.95rem;font-weight:600;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.header-tag{font-size:.66rem;color:rgba(255,255,255,.55)}
 
 /* Scroll container */
 .scroll-wrap{
@@ -186,18 +188,18 @@ body{
 
 <div class="bg-photo" id="bgPhoto"></div>
 
-<div class="header">
-  <div class="header-inner">
-    <div class="header-avatar"><img src="audio/zoey-avatar.jpg" alt="知意" /></div>
-    <div class="header-info">
-      <div class="header-name">ZoeyTalk</div>
-      <div class="header-tag">内容由 AI 生成</div>
+<div class="scroll-wrap">
+  <div class="photo-spacer" style="position:relative">
+    <div class="header">
+      <div class="header-inner">
+        <div class="header-avatar"><img src="audio/zoey-avatar.jpg" alt="知意" /></div>
+        <div class="header-info">
+          <div class="header-name">ZoeyTalk</div>
+          <div class="header-tag">内容由 AI 生成</div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-
-<div class="scroll-wrap">
-  <div class="photo-spacer"></div>
   <div class="chat-area" id="chatArea">
     <div class="loading">loading...</div>
   </div>
@@ -230,9 +232,7 @@ body{
     fetch(MANIFEST_URL+'?t='+Date.now()).then(function(r){return r.json()}).then(function(data){
       manifest=data;
       manifest.sort(function(a,b){
-        if(a.date&&b.date){var c=a.date.localeCompare(b.date);if(c)return c}
-        if(a.category==='briefing'&&b.category!=='briefing')return-1;
-        if(a.category!=='briefing'&&b.category==='briefing')return 1;
+        if(a.date&&b.date){var c=b.date.localeCompare(a.date);if(c)return c}
         return 0;
       });
       render();
