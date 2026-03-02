@@ -27,13 +27,13 @@ body{
 }
 .bg-photo::after{
   content:'';position:absolute;bottom:0;left:0;right:0;
-  height:55%;
-  background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.5) 40%,transparent 100%);
+  height:58%;
+  background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.6) 35%,transparent 100%);
 }
 
-/* Header — positioned at bottom of photo spacer, not overlapping face */
+/* Header — fixed at top */
 .header{
-  position:absolute;bottom:0;left:0;right:0;z-index:200;
+  position:fixed;top:0;left:0;right:0;z-index:200;
   pointer-events:none;
 }
 .header-inner{
@@ -41,6 +41,7 @@ body{
   display:flex;align-items:center;gap:10px;
   height:48px;padding:0 18px;
   pointer-events:auto;
+  background:linear-gradient(to bottom,rgba(0,0,0,.4) 0%,transparent 100%);
 }
 .header-avatar{
   width:34px;height:34px;border-radius:50%;overflow:hidden;
@@ -52,19 +53,22 @@ body{
 .header-name{font-size:.95rem;font-weight:600;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .header-tag{font-size:.66rem;color:rgba(255,255,255,.55)}
 
-/* Scroll container */
+/* Scroll container — fixed bottom panel so cards never cover the face */
 .scroll-wrap{
-  position:relative;z-index:1;
-  min-height:100vh;min-height:100dvh;
+  position:fixed;bottom:0;left:0;right:0;z-index:1;
+  height:52vh;height:52dvh;
   display:flex;flex-direction:column;
-  justify-content:flex-end;
 }
 .photo-spacer{
-  flex-shrink:0;height:48vh;pointer-events:none;
+  display:none;
 }
 .chat-area{
   max-width:480px;width:100%;margin:0 auto;
   padding:0 14px calc(40px + env(safe-area-inset-bottom));
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  flex:1;
+  mask-image:linear-gradient(to bottom,transparent 0px,#000 12px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0px,#000 12px);
 }
 
 /* Time divider */
@@ -188,18 +192,17 @@ body{
 
 <div class="bg-photo" id="bgPhoto"></div>
 
-<div class="scroll-wrap">
-  <div class="photo-spacer" style="position:relative">
-    <div class="header">
-      <div class="header-inner">
-        <div class="header-avatar"><img src="audio/zoey-avatar.jpg" alt="知意" /></div>
-        <div class="header-info">
-          <div class="header-name">ZoeyTalk</div>
-          <div class="header-tag">内容由 AI 生成</div>
-        </div>
-      </div>
+<div class="header">
+  <div class="header-inner">
+    <div class="header-avatar"><img src="audio/zoey-avatar.jpg" alt="知意" /></div>
+    <div class="header-info">
+      <div class="header-name">ZoeyTalk</div>
+      <div class="header-tag">内容由 AI 生成</div>
     </div>
   </div>
+</div>
+
+<div class="scroll-wrap">
   <div class="chat-area" id="chatArea">
     <div class="loading">loading...</div>
   </div>
@@ -222,7 +225,7 @@ body{
   var manifest=[],currentIdx=-1,speedIdx=1,expandedScripts={};
 
   function fmt(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec}
-  var catLabel={briefing:'每日简报',interview:'面试准备'};
+  var catLabel={briefing:'每日简报',interview:'面试准备','zoey-talk':'Zoey Talk'};
 
   function fmtDate(ds){
     if(!ds)return'';var p=ds.split('-');return parseInt(p[1])+'月'+parseInt(p[2])+'日';
