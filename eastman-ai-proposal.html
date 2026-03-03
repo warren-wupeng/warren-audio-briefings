@@ -403,19 +403,126 @@
     background: rgba(59,130,246,0.03);
   }
 
-  /* === Architecture Diagram === */
-  .arch-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
+  /* === Architecture Diagram (Visual) === */
+  .arch-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     margin: 10px 0;
-    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
-    font-size: 13px;
-    line-height: 1.8;
-    white-space: pre;
-    overflow-x: auto;
+    align-items: center;
+  }
+
+  .arch-layer {
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .arch-layer-box {
+    flex: 1;
+    border-radius: 12px;
+    padding: 16px 20px;
+    position: relative;
+  }
+
+  .arch-layer-box.user {
+    background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(6,182,212,0.08) 100%);
+    border: 1px solid rgba(59,130,246,0.3);
+  }
+
+  .arch-layer-box.app {
+    background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(59,130,246,0.08) 100%);
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+
+  .arch-layer-box.ai {
+    background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(236,72,153,0.08) 100%);
+    border: 1px solid rgba(139,92,246,0.3);
+  }
+
+  .arch-layer-box.data {
+    background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.08) 100%);
+    border: 1px solid rgba(245,158,11,0.3);
+  }
+
+  .arch-layer-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .arch-layer-label.user { color: var(--accent-blue); }
+  .arch-layer-label.app { color: var(--accent-green); }
+  .arch-layer-label.ai { color: var(--accent-purple); }
+  .arch-layer-label.data { color: var(--accent-amber); }
+
+  .arch-layer-title {
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .arch-layer-box.user .arch-layer-title { color: var(--accent-cyan); }
+  .arch-layer-box.app .arch-layer-title { color: var(--accent-green); }
+  .arch-layer-box.ai .arch-layer-title { color: var(--accent-purple); }
+  .arch-layer-box.data .arch-layer-title { color: var(--accent-amber); }
+
+  .arch-items {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .arch-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
     color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arch-item .ai-icon {
+    font-size: 14px;
+  }
+
+  .arch-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  .arch-connector {
+    width: 2px;
+    height: 18px;
+    background: linear-gradient(to bottom, var(--border-light), rgba(59,130,246,0.3));
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .arch-connector::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid rgba(59,130,246,0.4);
   }
 
   /* === Timeline === */
@@ -655,7 +762,15 @@
     .feat-table td:first-child { white-space: normal; width: auto; }
 
     /* Architecture */
-    .arch-box { font-size: 9px; padding: 12px; line-height: 1.6; }
+    .arch-layer { gap: 8px; }
+    .arch-layer-label { font-size: 8px; width: 40px; letter-spacing: 1px; }
+    .arch-layer-box { padding: 10px 12px; }
+    .arch-layer-title { font-size: 9px; margin-bottom: 6px; }
+    .arch-items { gap: 6px; }
+    .arch-item { font-size: 10px; padding: 4px 8px; }
+    .arch-item .ai-icon { font-size: 12px; }
+    .arch-sub { font-size: 9px; margin-top: 4px; }
+    .arch-connector { height: 12px; }
 
     /* Timeline */
     .timeline-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
@@ -932,24 +1047,66 @@
     <div class="section-title">技术架构</div>
     <div class="section-desc">全国产技术栈，数据不出境，按量付费</div>
 
-    <div class="arch-box">
- &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
- &#9474;  Web &#31649;&#29702;&#21518;&#21488;  |  &#31227;&#21160;&#31471; H5/&#23567;&#31243;&#24207;&#65288;&#20108;&#26399;&#65289;     &#9474;  &#8592; &#29992;&#25143;&#23618;
- &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
-                       &#9474;
- &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
- &#9474; &#32032;&#26448;&#31649;&#29702;&#26381;&#21153; | AI &#20869;&#23481;&#29983;&#25104; | &#20998;&#21457;&#31649;&#29702;&#26381;&#21153;  &#9474;  &#8592; &#24212;&#29992;&#23618;
- &#9474;         &#21697;&#29260;&#30693;&#35782;&#24211; &amp; &#21512;&#35268;&#24341;&#25806;           &#9474;
- &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
-                       &#9474;
- &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
- &#9474; &#22810;&#27169;&#24577;&#29702;&#35299; | &#21521;&#37327;&#26816;&#32034;(RAG) | &#20869;&#23481;&#29983;&#25104;(LLM)  &#9474;  &#8592; AI &#23618;
- &#9474;  &#36890;&#20041;&#21315;&#38382; / DeepSeek / &#25991;&#24515;&#19968;&#35328;       &#9474;
- &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
-                       &#9474;
- &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
- &#9474;  &#23545;&#35937;&#23384;&#20648;(OSS) | &#21521;&#37327;&#25968;&#25454;&#24211; | &#20851;&#31995;&#22411;DB   &#9474;  &#8592; &#25968;&#25454;&#23618;
- &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</div>
+    <div class="arch-diagram">
+      <!-- User Layer -->
+      <div class="arch-layer">
+        <div class="arch-layer-label user">用户层</div>
+        <div class="arch-layer-box user">
+          <div class="arch-layer-title">USER INTERFACE</div>
+          <div class="arch-items">
+            <div class="arch-item"><span class="ai-icon">&#128187;</span> Web 管理后台</div>
+            <div class="arch-item"><span class="ai-icon">&#128241;</span> 移动端 H5 / 小程序（二期）</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-connector"></div>
+
+      <!-- Application Layer -->
+      <div class="arch-layer">
+        <div class="arch-layer-label app">应用层</div>
+        <div class="arch-layer-box app">
+          <div class="arch-layer-title">APPLICATION SERVICES</div>
+          <div class="arch-items">
+            <div class="arch-item"><span class="ai-icon">&#128451;</span> 素材管理服务</div>
+            <div class="arch-item"><span class="ai-icon">&#9889;</span> AI 内容生成</div>
+            <div class="arch-item"><span class="ai-icon">&#128640;</span> 分发管理服务</div>
+          </div>
+          <div class="arch-sub">品牌知识库 &amp; 合规引擎</div>
+        </div>
+      </div>
+
+      <div class="arch-connector"></div>
+
+      <!-- AI Layer -->
+      <div class="arch-layer">
+        <div class="arch-layer-label ai">AI 层</div>
+        <div class="arch-layer-box ai">
+          <div class="arch-layer-title">AI ENGINE</div>
+          <div class="arch-items">
+            <div class="arch-item"><span class="ai-icon">&#128065;</span> 多模态理解</div>
+            <div class="arch-item"><span class="ai-icon">&#128269;</span> 向量检索 (RAG)</div>
+            <div class="arch-item"><span class="ai-icon">&#129302;</span> 内容生成 (LLM)</div>
+          </div>
+          <div class="arch-sub">通义千问 / DeepSeek / 文心一言</div>
+        </div>
+      </div>
+
+      <div class="arch-connector"></div>
+
+      <!-- Data Layer -->
+      <div class="arch-layer">
+        <div class="arch-layer-label data">数据层</div>
+        <div class="arch-layer-box data">
+          <div class="arch-layer-title">DATA INFRASTRUCTURE</div>
+          <div class="arch-items">
+            <div class="arch-item"><span class="ai-icon">&#128230;</span> 对象存储 (OSS)</div>
+            <div class="arch-item"><span class="ai-icon">&#127759;</span> 向量数据库</div>
+            <div class="arch-item"><span class="ai-icon">&#128450;</span> 关系型 DB</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="highlight-box amber" style="margin-top: 16px;">
       <h4>技术选型要点</h4>
