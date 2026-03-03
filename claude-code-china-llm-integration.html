@@ -677,7 +677,7 @@
     font-family: "SF Mono", monospace;
   }
 
-  /* === Responsive === */
+  /* === Responsive: Tablet === */
   @media (max-width: 1024px) {
     .slide { padding: 40px; }
     .cover-title { font-size: 40px; }
@@ -689,6 +689,165 @@
     .timeline::before { display: none; }
     .insight-grid { grid-template-columns: 1fr; }
     .nav { display: none; }
+  }
+
+  /* === Responsive: Mobile === */
+  @media (max-width: 640px) {
+    .slide {
+      padding: 28px 18px;
+      min-height: auto;
+      min-height: 100dvh;
+    }
+    .cover-badge {
+      font-size: 11px;
+      padding: 4px 14px;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+    }
+    .cover-title {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .cover-subtitle {
+      font-size: 15px;
+      margin-bottom: 32px;
+    }
+    .cover-meta {
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      font-size: 12px;
+      justify-content: center;
+    }
+    .section-num {
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .section-title {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+    .protocol-card {
+      padding: 18px;
+    }
+    .protocol-card h3 {
+      font-size: 15px;
+    }
+    .protocol-card .card-num {
+      font-size: 36px;
+    }
+    .protocol-card .env-var {
+      font-size: 11px;
+    }
+    .protocol-card p {
+      font-size: 13px;
+    }
+    .provider-card {
+      padding: 14px 16px;
+      gap: 12px;
+    }
+    .provider-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+    .provider-name {
+      font-size: 14px;
+    }
+    .provider-protocol {
+      font-size: 11px;
+    }
+    .provider-desc {
+      font-size: 12px;
+    }
+    .category-label {
+      font-size: 16px;
+    }
+    .matrix-table {
+      font-size: 12px;
+    }
+    .matrix-table th {
+      padding: 10px 8px;
+      font-size: 11px;
+    }
+    .matrix-table td {
+      padding: 8px;
+      font-size: 12px;
+    }
+    .arch-option {
+      padding: 20px 16px;
+    }
+    .arch-label {
+      font-size: 11px;
+    }
+    .arch-title {
+      font-size: 16px;
+    }
+    .arch-flow {
+      font-size: 12px;
+      gap: 4px;
+    }
+    .arch-node {
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+    .arch-arrow {
+      font-size: 14px;
+    }
+    .arch-pros {
+      font-size: 12px;
+    }
+    .timeline-item {
+      padding: 16px;
+    }
+    .timeline-phase {
+      font-size: 11px;
+    }
+    .timeline-title {
+      font-size: 15px;
+    }
+    .timeline-desc {
+      font-size: 12px;
+    }
+    .code-block {
+      font-size: 12px;
+      padding: 14px;
+    }
+    .code-block .code-title {
+      font-size: 11px;
+      padding: 6px 12px;
+    }
+    .code-block.has-title {
+      padding-top: 38px;
+    }
+    .insight-grid {
+      gap: 12px;
+    }
+    .warning-box {
+      font-size: 12px;
+      padding: 12px 14px;
+    }
+    .slide-footer {
+      font-size: 10px;
+    }
+    /* Fix inline grid styles in HTML */
+    [style*="grid-template-columns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="font-size: 42px"] {
+      font-size: 24px !important;
+    }
+    [style*="margin-bottom: 48px"] {
+      margin-bottom: 24px !important;
+    }
+    [style*="gap: 24px"] {
+      gap: 14px !important;
+    }
   }
 
   /* === Animations === */
@@ -1380,14 +1539,38 @@
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
     const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
-    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
       e.preventDefault();
       if (current < slides.length - 1) scrollToSlide(current + 1);
-    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
       e.preventDefault();
       if (current > 0) scrollToSlide(current - 1);
     }
   });
+
+  // Mobile: show slide indicator
+  (function(){
+    if(window.innerWidth > 640) return;
+    var ind = document.createElement('div');
+    ind.id = 'mobileInd';
+    ind.style.cssText = 'position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:6px;padding:6px 12px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-radius:20px;';
+    for(var i=0;i<slides.length;i++){
+      var d=document.createElement('div');
+      d.style.cssText='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .3s;';
+      if(i===0) d.style.background='rgba(59,130,246,.9)';
+      ind.appendChild(d);
+    }
+    document.body.appendChild(ind);
+    window.addEventListener('scroll',function(){
+      var sp=window.scrollY+window.innerHeight/2;
+      var ds=ind.children;
+      for(var i=0;i<slides.length;i++){
+        var t=slides[i].offsetTop,b=t+slides[i].offsetHeight;
+        ds[i].style.background=(sp>=t&&sp<b)?'rgba(59,130,246,.9)':'rgba(255,255,255,.25)';
+        ds[i].style.transform=(sp>=t&&sp<b)?'scale(1.4)':'scale(1)';
+      }
+    });
+  })();
 </script>
 </body>
 </html>
