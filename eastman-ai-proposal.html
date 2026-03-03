@@ -403,126 +403,120 @@
     background: rgba(59,130,246,0.03);
   }
 
-  /* === Architecture Diagram (Visual) === */
-  .arch-diagram {
+  /* === Architecture Diagram === */
+  .arch-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 10px 0;
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--text-secondary);
+  }
+
+  /* === Visual Architecture === */
+  .arch-visual {
     display: flex;
     flex-direction: column;
     gap: 0;
-    margin: 10px 0;
-    align-items: center;
+    margin: 8px 0;
   }
 
   .arch-layer {
-    width: 100%;
-    max-width: 780px;
     display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .arch-layer-box {
-    flex: 1;
-    border-radius: 12px;
-    padding: 16px 20px;
+    align-items: stretch;
+    gap: 0;
     position: relative;
-  }
-
-  .arch-layer-box.user {
-    background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(6,182,212,0.08) 100%);
-    border: 1px solid rgba(59,130,246,0.3);
-  }
-
-  .arch-layer-box.app {
-    background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(59,130,246,0.08) 100%);
-    border: 1px solid rgba(16,185,129,0.3);
-  }
-
-  .arch-layer-box.ai {
-    background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(236,72,153,0.08) 100%);
-    border: 1px solid rgba(139,92,246,0.3);
-  }
-
-  .arch-layer-box.data {
-    background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.08) 100%);
-    border: 1px solid rgba(245,158,11,0.3);
   }
 
   .arch-layer-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    width: 56px;
-    text-align: right;
+    width: 72px;
     flex-shrink: 0;
-  }
-
-  .arch-layer-label.user { color: var(--accent-blue); }
-  .arch-layer-label.app { color: var(--accent-green); }
-  .arch-layer-label.ai { color: var(--accent-purple); }
-  .arch-layer-label.data { color: var(--accent-amber); }
-
-  .arch-layer-title {
-    font-size: 11px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
-
-  .arch-layer-box.user .arch-layer-title { color: var(--accent-cyan); }
-  .arch-layer-box.app .arch-layer-title { color: var(--accent-green); }
-  .arch-layer-box.ai .arch-layer-title { color: var(--accent-purple); }
-  .arch-layer-box.data .arch-layer-title { color: var(--accent-amber); }
-
-  .arch-items {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .arch-item {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 12px;
-    color: var(--text-secondary);
     display: flex;
     align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 8px 0 0 8px;
+    padding: 8px 4px;
+  }
+
+  .arch-layer-content {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 0 8px 8px 0;
+    border: 1px solid;
+    border-left: none;
+    min-height: 54px;
+    align-items: center;
+  }
+
+  .arch-layer-label.l-user { background: rgba(59,130,246,0.2); color: var(--accent-blue); }
+  .arch-layer-content.l-user { border-color: rgba(59,130,246,0.2); background: rgba(59,130,246,0.04); }
+
+  .arch-layer-label.l-mid { background: rgba(139,92,246,0.2); color: var(--accent-purple); }
+  .arch-layer-content.l-mid { border-color: rgba(139,92,246,0.2); background: rgba(139,92,246,0.04); }
+
+  .arch-layer-label.l-app { background: rgba(6,182,212,0.2); color: var(--accent-cyan); }
+  .arch-layer-content.l-app { border-color: rgba(6,182,212,0.2); background: rgba(6,182,212,0.04); }
+
+  .arch-layer-label.l-ai { background: rgba(16,185,129,0.2); color: var(--accent-green); }
+  .arch-layer-content.l-ai { border-color: rgba(16,185,129,0.2); background: rgba(16,185,129,0.04); }
+
+  .arch-layer-label.l-data { background: rgba(245,158,11,0.2); color: var(--accent-amber); }
+  .arch-layer-content.l-data { border-color: rgba(245,158,11,0.2); background: rgba(245,158,11,0.04); }
+
+  .arch-chip {
+    display: inline-flex;
+    align-items: center;
     gap: 6px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    white-space: nowrap;
   }
 
-  .arch-item .ai-icon {
-    font-size: 14px;
-  }
-
-  .arch-sub {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 6px;
-    font-style: italic;
-  }
+  .arch-chip .chip-icon { font-size: 13px; opacity: 0.8; }
+  .arch-chip.dim { opacity: 0.45; font-style: italic; }
 
   .arch-connector {
+    display: flex;
+    justify-content: center;
+    padding: 3px 0;
+    margin-left: 72px;
+  }
+
+  .arch-connector .arrow {
     width: 2px;
-    height: 18px;
-    background: linear-gradient(to bottom, var(--border-light), rgba(59,130,246,0.3));
-    margin: 0 auto;
+    height: 14px;
+    background: linear-gradient(180deg, var(--border-light), var(--text-muted));
     position: relative;
   }
 
-  .arch-connector::after {
+  .arch-connector .arrow::after {
     content: '';
     position: absolute;
     bottom: -3px;
     left: 50%;
     transform: translateX(-50%);
-    width: 0;
-    height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-top: 5px solid rgba(59,130,246,0.4);
+    border-top: 5px solid var(--text-muted);
   }
 
   /* === Timeline === */
@@ -762,15 +756,13 @@
     .feat-table td:first-child { white-space: normal; width: auto; }
 
     /* Architecture */
-    .arch-layer { gap: 8px; }
-    .arch-layer-label { font-size: 8px; width: 40px; letter-spacing: 1px; }
-    .arch-layer-box { padding: 10px 12px; }
-    .arch-layer-title { font-size: 9px; margin-bottom: 6px; }
-    .arch-items { gap: 6px; }
-    .arch-item { font-size: 10px; padding: 4px 8px; }
-    .arch-item .ai-icon { font-size: 12px; }
-    .arch-sub { font-size: 9px; margin-top: 4px; }
-    .arch-connector { height: 12px; }
+    .arch-box { font-size: 9px; padding: 12px; line-height: 1.6; }
+    .arch-layer-label { width: 40px !important; font-size: 8px !important; padding: 4px 2px !important; }
+    .arch-layer-content { padding: 8px 10px !important; gap: 5px !important; }
+    .arch-chip { font-size: 10px !important; padding: 3px 7px !important; }
+    .arch-chip .chip-icon { font-size: 10px !important; }
+    .arch-connector { margin-left: 40px !important; }
+    .arch-connector .arrow { height: 8px !important; }
 
     /* Timeline */
     .timeline-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
@@ -813,7 +805,7 @@
         <div class="cover-meta-item"><span>日期</span>&nbsp;<strong>2026.03</strong></div>
       </div>
     </div>
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 1: 客户背景 ========== -->
@@ -859,7 +851,7 @@
       </div>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 2: 核心痛点 ========== -->
@@ -891,7 +883,7 @@
       </div>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 3: 范围聚焦 ========== -->
@@ -932,7 +924,7 @@
       </p>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 4: 方案概览 ========== -->
@@ -950,7 +942,7 @@
       <div class="card" style="border-color: rgba(16,185,129,0.3);">
         <div class="card-icon icon-green">&#9889;</div>
         <h3>AI 内容工厂</h3>
-        <p>基于素材自动生成营销文案、短视频脚本、图文排版，支持多渠道适配，批量变体生成，合规自动检测</p>
+        <p>基于素材生成营销文案初稿、短视频脚本、图文排版，支持多渠道适配，批量变体生成，AI 辅助合规预检</p>
       </div>
       <div class="card">
         <div class="card-icon icon-purple">&#128279;</div>
@@ -964,14 +956,14 @@
       </div>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 5: 智能素材库详情 ========== -->
   <div class="slide" id="slide-5">
     <div class="section-num">05 / Module 1</div>
     <div class="section-title">智能素材库</div>
-    <div class="section-desc">AI 驱动的品牌数字资产管理平台</div>
+    <div class="section-desc">AI 驱动的品牌数字资产管理平台（DAM）</div>
 
     <table class="feat-table">
       <tr><th>功能</th><th>说明</th></tr>
@@ -980,8 +972,8 @@
         <td>按品牌独立分区，支持图片、视频、PDF、PPT、PSD 等全格式上传管理</td>
       </tr>
       <tr>
-        <td>AI 自动打标</td>
-        <td>上传即识别：品牌归属、产品系列（前挡/侧后/天窗）、适用车型、内容类型、适用渠道</td>
+        <td>AI 智能打标</td>
+        <td>基于品牌知识库定制训练，上传即识别：品牌归属、产品系列（前挡/侧后/天窗）、适用车型、内容类型、适用渠道</td>
       </tr>
       <tr>
         <td>智能搜索</td>
@@ -1001,14 +993,14 @@
       </tr>
     </table>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 6: AI 内容工厂详情 ========== -->
   <div class="slide" id="slide-6">
     <div class="section-num">06 / Module 2</div>
     <div class="section-title">AI 内容工厂</div>
-    <div class="section-desc">选素材 + 选渠道，AI 自动出内容</div>
+    <div class="section-desc">选素材 + 选渠道，AI 辅助高效出内容</div>
 
     <table class="feat-table">
       <tr><th>功能</th><th>说明</th></tr>
@@ -1022,23 +1014,23 @@
       </tr>
       <tr>
         <td>短视频脚本</td>
-        <td>输入产品 + 卖点，输出分镜脚本（画面描述 + 口播 + 字幕），适配 15s/30s/60s</td>
+        <td>输入产品 + 卖点，AI 生成初稿分镜脚本（画面描述 + 口播 + 字幕），人工精修后适配 15s/30s/60s</td>
       </tr>
       <tr>
         <td>图文排版</td>
-        <td>自动排版小红书笔记、公众号图文，支持品牌模板定制</td>
+        <td>基于品牌模板填充生成小红书笔记、公众号图文，AI 输出结构化内容 + 模板引擎渲染成品</td>
       </tr>
       <tr>
         <td>批量变体</td>
         <td>一键生成多个内容变体（不同角度/风格），方便 A/B 测试</td>
       </tr>
       <tr>
-        <td>合规检查</td>
-        <td>AI 自动检测广告法违规（绝对化用语、虚假宣传），标注风险并建议修改</td>
+        <td>AI 辅助合规预检</td>
+        <td>规则引擎 + AI 双重检测广告法违规风险（绝对化用语、虚假宣传），标注风险并建议修改，辅助人工审核</td>
       </tr>
     </table>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 7: 技术架构 ========== -->
@@ -1047,63 +1039,64 @@
     <div class="section-title">技术架构</div>
     <div class="section-desc">全国产技术栈，数据不出境，按量付费</div>
 
-    <div class="arch-diagram">
-      <!-- User Layer -->
+    <div class="arch-visual">
+      <!-- 用户层 -->
       <div class="arch-layer">
-        <div class="arch-layer-label user">用户层</div>
-        <div class="arch-layer-box user">
-          <div class="arch-layer-title">USER INTERFACE</div>
-          <div class="arch-items">
-            <div class="arch-item"><span class="ai-icon">&#128187;</span> Web 管理后台</div>
-            <div class="arch-item"><span class="ai-icon">&#128241;</span> 移动端 H5 / 小程序（二期）</div>
-          </div>
+        <div class="arch-layer-label l-user">用户层</div>
+        <div class="arch-layer-content l-user">
+          <span class="arch-chip"><span class="chip-icon">&#128187;</span> Web 管理后台</span>
+          <span class="arch-chip dim"><span class="chip-icon">&#128241;</span> 移动端 H5 / 小程序（二期）</span>
         </div>
       </div>
 
-      <div class="arch-connector"></div>
+      <div class="arch-connector"><div class="arrow"></div></div>
 
-      <!-- Application Layer -->
+      <!-- 中间件层 -->
       <div class="arch-layer">
-        <div class="arch-layer-label app">应用层</div>
-        <div class="arch-layer-box app">
-          <div class="arch-layer-title">APPLICATION SERVICES</div>
-          <div class="arch-items">
-            <div class="arch-item"><span class="ai-icon">&#128451;</span> 素材管理服务</div>
-            <div class="arch-item"><span class="ai-icon">&#9889;</span> AI 内容生成</div>
-            <div class="arch-item"><span class="ai-icon">&#128640;</span> 分发管理服务</div>
-          </div>
-          <div class="arch-sub">品牌知识库 &amp; 合规引擎</div>
+        <div class="arch-layer-label l-mid">中间件</div>
+        <div class="arch-layer-content l-mid">
+          <span class="arch-chip"><span class="chip-icon">&#128737;</span> API 网关</span>
+          <span class="arch-chip"><span class="chip-icon">&#127760;</span> CDN 加速分发</span>
+          <span class="arch-chip"><span class="chip-icon">&#9889;</span> 异步任务队列</span>
         </div>
       </div>
 
-      <div class="arch-connector"></div>
+      <div class="arch-connector"><div class="arrow"></div></div>
 
-      <!-- AI Layer -->
+      <!-- 应用层 -->
       <div class="arch-layer">
-        <div class="arch-layer-label ai">AI 层</div>
-        <div class="arch-layer-box ai">
-          <div class="arch-layer-title">AI ENGINE</div>
-          <div class="arch-items">
-            <div class="arch-item"><span class="ai-icon">&#128065;</span> 多模态理解</div>
-            <div class="arch-item"><span class="ai-icon">&#128269;</span> 向量检索 (RAG)</div>
-            <div class="arch-item"><span class="ai-icon">&#129302;</span> 内容生成 (LLM)</div>
-          </div>
-          <div class="arch-sub">通义千问 / DeepSeek / 文心一言</div>
+        <div class="arch-layer-label l-app">应用层</div>
+        <div class="arch-layer-content l-app">
+          <span class="arch-chip"><span class="chip-icon">&#128451;</span> 素材管理服务</span>
+          <span class="arch-chip"><span class="chip-icon">&#9889;</span> AI 内容生成</span>
+          <span class="arch-chip"><span class="chip-icon">&#128640;</span> 分发管理服务</span>
+          <span class="arch-chip"><span class="chip-icon">&#128214;</span> 品牌知识库</span>
+          <span class="arch-chip"><span class="chip-icon">&#128275;</span> 合规引擎</span>
         </div>
       </div>
 
-      <div class="arch-connector"></div>
+      <div class="arch-connector"><div class="arrow"></div></div>
 
-      <!-- Data Layer -->
+      <!-- AI 层 -->
       <div class="arch-layer">
-        <div class="arch-layer-label data">数据层</div>
-        <div class="arch-layer-box data">
-          <div class="arch-layer-title">DATA INFRASTRUCTURE</div>
-          <div class="arch-items">
-            <div class="arch-item"><span class="ai-icon">&#128230;</span> 对象存储 (OSS)</div>
-            <div class="arch-item"><span class="ai-icon">&#127759;</span> 向量数据库</div>
-            <div class="arch-item"><span class="ai-icon">&#128450;</span> 关系型 DB</div>
-          </div>
+        <div class="arch-layer-label l-ai">AI 层</div>
+        <div class="arch-layer-content l-ai">
+          <span class="arch-chip"><span class="chip-icon">&#128065;</span> 多模态理解</span>
+          <span class="arch-chip"><span class="chip-icon">&#128269;</span> 向量检索 (RAG)</span>
+          <span class="arch-chip"><span class="chip-icon">&#9997;</span> 内容生成 (LLM)</span>
+          <span class="arch-chip" style="border-color:rgba(16,185,129,0.4);"><span class="chip-icon">&#11088;</span> 通义千问全家桶（MVP 主力）</span>
+        </div>
+      </div>
+
+      <div class="arch-connector"><div class="arrow"></div></div>
+
+      <!-- 数据层 -->
+      <div class="arch-layer">
+        <div class="arch-layer-label l-data">数据层</div>
+        <div class="arch-layer-content l-data">
+          <span class="arch-chip"><span class="chip-icon">&#128230;</span> 对象存储 (OSS)</span>
+          <span class="arch-chip"><span class="chip-icon">&#128200;</span> 向量数据库</span>
+          <span class="arch-chip"><span class="chip-icon">&#128451;</span> 关系型 DB</span>
         </div>
       </div>
     </div>
@@ -1111,13 +1104,13 @@
     <div class="highlight-box amber" style="margin-top: 16px;">
       <h4>技术选型要点</h4>
       <ul>
-        <li><strong>AI 模型</strong>：优先国产大模型（通义千问 / DeepSeek / 文心），数据合规无出境风险</li>
-        <li><strong>向量检索</strong>：Embedding + RAG 实现语义搜索，支持文本+图片跨模态检索</li>
-        <li><strong>存储</strong>：阿里云 OSS，支持图片/视频/文档大容量存储</li>
+        <li><strong>AI 模型</strong>：MVP 阶段以通义千问全家桶为主力（视觉理解 VL + 文案生成 Max + Embedding），二期引入多模型路由</li>
+        <li><strong>异步处理</strong>：任务队列处理 AI 耗时操作（打标/生成），避免用户等待超时</li>
+        <li><strong>存储 + CDN</strong>：阿里云 OSS 存储 + CDN 加速分发，覆盖全国 4000+ 门店</li>
       </ul>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 8: 实施计划 ========== -->
@@ -1130,7 +1123,7 @@
       <div class="timeline-item">
         <div class="timeline-phase">Phase 1 - MVP</div>
         <div class="timeline-title">素材库 + 基础 AI</div>
-        <div class="timeline-weeks">4-6 周</div>
+        <div class="timeline-weeks">6-8 周</div>
         <ul>
           <li>多品牌素材库搭建</li>
           <li>AI 自动打标与分类</li>
@@ -1147,7 +1140,7 @@
           <li>短视频脚本生成</li>
           <li>图文排版生成</li>
           <li>批量变体 + A/B 测试</li>
-          <li>广告法合规检测</li>
+          <li>AI 辅助合规预检</li>
           <li>素材分发与追踪</li>
         </ul>
       </div>
@@ -1165,7 +1158,7 @@
       </div>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 9: 优势 ========== -->
@@ -1176,18 +1169,18 @@
     <div class="card-grid">
       <div class="card">
         <div class="card-icon icon-blue">&#129504;</div>
-        <h3>AI 原生架构</h3>
-        <p>不是传统 DAM 加个 AI 按钮，而是从底层以 AI 为核心构建，素材理解和内容生成深度融合</p>
+        <h3>AI 优先设计</h3>
+        <p>以 AI 驱动为核心设计理念，素材理解与内容生成深度融合，而非传统系统的简单 AI 叠加</p>
       </div>
       <div class="card">
         <div class="card-icon icon-green">&#127919;</div>
-        <h3>行业理解力</h3>
-        <p>深入理解汽车后市场营销场景，贴膜行业的产品特性、门店经营模式、消费者决策链路</p>
+        <h3>快速理解业务场景</h3>
+        <p>通过深入的行业调研和需求沟通定制方案，已深入研究伊士曼三大品牌特性与门店营销场景</p>
       </div>
       <div class="card">
         <div class="card-icon icon-amber">&#128640;</div>
         <h3>快速交付</h3>
-        <p>MVP 4-6 周可用，小步快跑、快速验证、持续迭代，不做大而全的瀑布式开发</p>
+        <p>MVP 6-8 周可用，小步快跑、快速验证、持续迭代，不做大而全的瀑布式开发</p>
       </div>
       <div class="card">
         <div class="card-icon icon-purple">&#128274;</div>
@@ -1196,7 +1189,7 @@
       </div>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
   <!-- ========== Slide 10: 下一步 ========== -->
@@ -1219,7 +1212,7 @@
       <p style="margin:0;color:var(--text-primary);">伊士曼 AI 知识库核心需求梳理 -- 现场会议，乙方演示 demo 与案例，甲方补充需求细节</p>
     </div>
 
-    <div class="slide-footer">ZoeyTalk / Eastman AI Proposal</div>
+    <div class="slide-footer">Eastman AI Proposal · Draft v0.1</div>
   </div>
 
 </div><!-- /deck -->
