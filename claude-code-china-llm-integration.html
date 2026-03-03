@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Claude Code 国内大模型接入方案</title>
 <style>
   :root {
@@ -26,38 +26,54 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
-
-  body {
+  html, body {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
-    overflow-x: hidden;
   }
 
-  /* === Slide Container === */
+  /* === Slide System === */
+  .deck {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+  }
+
   .slide {
-    min-height: 100vh;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 60px 80px;
-    position: relative;
-    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
   }
 
   .slide::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     pointer-events: none;
   }
 
-  /* === Navigation === */
+  /* === Navigation Dots (Desktop) === */
   .nav {
     position: fixed;
     right: 24px;
@@ -86,23 +102,48 @@
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
   }
 
-  .nav-label {
-    position: absolute;
-    right: 24px;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    border: 1px solid var(--border-light);
+  /* === Mobile Bottom Indicator === */
+  .mobile-ind {
+    display: none;
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 20px;
   }
 
-  .nav-dot:hover .nav-label {
-    opacity: 1;
+  .mobile-ind .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    transition: all .3s;
+  }
+
+  .mobile-ind .dot.active {
+    background: rgba(59,130,246,.9);
+    transform: scale(1.5);
+  }
+
+  /* === Page Counter === */
+  .page-counter {
+    position: fixed;
+    bottom: 20px;
+    right: 24px;
+    z-index: 100;
+    font-family: "SF Mono", monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: rgba(0,0,0,.4);
+    padding: 4px 12px;
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
   }
 
   /* === Slide 0: Cover === */
@@ -116,10 +157,8 @@
   .slide-cover::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
     background: radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
                 radial-gradient(ellipse at 70% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
     animation: coverPulse 8s ease-in-out infinite;
@@ -130,10 +169,7 @@
     50% { opacity: 1; }
   }
 
-  .cover-content {
-    position: relative;
-    z-index: 1;
-  }
+  .cover-content { position: relative; z-index: 1; }
 
   .cover-badge {
     display: inline-block;
@@ -229,8 +265,7 @@
 
   .protocol-card .card-num {
     position: absolute;
-    top: 16px;
-    right: 20px;
+    top: 16px; right: 20px;
     font-size: 48px;
     font-weight: 800;
     color: rgba(59, 130, 246, 0.08);
@@ -261,11 +296,7 @@
     line-height: 1.6;
   }
 
-  /* === Provider Table === */
-  .provider-section {
-    margin-top: 40px;
-  }
-
+  /* === Provider Cards === */
   .provider-category {
     display: flex;
     align-items: center;
@@ -274,8 +305,7 @@
   }
 
   .category-dot {
-    width: 12px;
-    height: 12px;
+    width: 12px; height: 12px;
     border-radius: 50%;
     flex-shrink: 0;
   }
@@ -309,8 +339,7 @@
   }
 
   .provider-icon {
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -386,14 +415,10 @@
   .matrix-table th:first-child {
     text-align: left;
     border-radius: 8px 0 0 0;
-    position: sticky;
-    left: 0;
-    z-index: 1;
+    position: sticky; left: 0; z-index: 1;
   }
 
-  .matrix-table th:last-child {
-    border-radius: 0 8px 0 0;
-  }
+  .matrix-table th:last-child { border-radius: 0 8px 0 0; }
 
   .matrix-table td {
     padding: 12px 16px;
@@ -406,30 +431,18 @@
     text-align: left;
     font-weight: 500;
     color: var(--text-primary);
-    position: sticky;
-    left: 0;
+    position: sticky; left: 0;
     background: var(--bg-primary);
     z-index: 1;
   }
 
-  .matrix-table tr:hover td {
-    background: rgba(59, 130, 246, 0.03);
-  }
+  .matrix-table tr:hover td { background: rgba(59, 130, 246, 0.03); }
+  .matrix-table tr:hover td:first-child { background: rgba(59, 130, 246, 0.06); }
 
-  .matrix-table tr:hover td:first-child {
-    background: rgba(59, 130, 246, 0.06);
-  }
+  .cell-yes { color: var(--accent-green); font-weight: 600; }
+  .cell-no { color: var(--text-muted); }
 
-  .cell-yes {
-    color: var(--accent-green);
-    font-weight: 600;
-  }
-
-  .cell-no {
-    color: var(--text-muted);
-  }
-
-  /* === Architecture Diagram === */
+  /* === Architecture === */
   .arch-container {
     display: flex;
     gap: 40px;
@@ -454,8 +467,7 @@
   .arch-option.recommended::after {
     content: 'RECOMMENDED';
     position: absolute;
-    top: -10px;
-    right: 20px;
+    top: -10px; right: 20px;
     background: var(--accent-blue);
     color: white;
     font-size: 10px;
@@ -502,10 +514,7 @@
     font-size: 16px;
   }
 
-  .arch-pros {
-    margin-top: 16px;
-    list-style: none;
-  }
+  .arch-pros { margin-top: 16px; list-style: none; }
 
   .arch-pros li {
     font-size: 13px;
@@ -517,8 +526,7 @@
 
   .arch-pros li::before {
     content: '+';
-    position: absolute;
-    left: 0;
+    position: absolute; left: 0;
     color: var(--accent-green);
     font-weight: 700;
   }
@@ -528,7 +536,7 @@
     color: var(--accent-red);
   }
 
-  /* === Lenovo Section === */
+  /* === Timeline === */
   .timeline {
     display: flex;
     gap: 0;
@@ -539,9 +547,7 @@
   .timeline::before {
     content: '';
     position: absolute;
-    top: 28px;
-    left: 0;
-    right: 0;
+    top: 28px; left: 0; right: 0;
     height: 2px;
     background: var(--border-light);
   }
@@ -553,8 +559,7 @@
   }
 
   .timeline-dot {
-    width: 16px;
-    height: 16px;
+    width: 16px; height: 16px;
     border-radius: 50%;
     margin: 20px auto 16px;
     position: relative;
@@ -600,9 +605,7 @@
 
   .code-block .code-title {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     padding: 8px 16px;
     background: rgba(255,255,255,0.03);
     font-size: 12px;
@@ -611,9 +614,7 @@
     font-family: inherit;
   }
 
-  .code-block.has-title {
-    padding-top: 48px;
-  }
+  .code-block.has-title { padding-top: 48px; }
 
   .code-comment { color: #6a737d; }
   .code-key { color: #79c0ff; }
@@ -621,7 +622,7 @@
   .code-string { color: #a5d6ff; }
   .code-env { color: #7ee787; }
 
-  /* === Key Insights === */
+  /* === Insight Grid === */
   .insight-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -660,208 +661,6 @@
     color: var(--text-secondary);
   }
 
-  /* === Footer === */
-  .slide-footer {
-    position: absolute;
-    bottom: 24px;
-    left: 80px;
-    right: 80px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-muted);
-    font-size: 12px;
-  }
-
-  .page-num {
-    font-family: "SF Mono", monospace;
-  }
-
-  /* === Responsive: Tablet === */
-  @media (max-width: 1024px) {
-    .slide { padding: 40px; }
-    .cover-title { font-size: 40px; }
-    .section-title { font-size: 32px; }
-    .protocol-grid { grid-template-columns: 1fr; }
-    .provider-cards { grid-template-columns: 1fr; }
-    .arch-container { flex-direction: column; }
-    .timeline { flex-direction: column; gap: 24px; }
-    .timeline::before { display: none; }
-    .insight-grid { grid-template-columns: 1fr; }
-    .nav { display: none; }
-  }
-
-  /* === Responsive: Mobile === */
-  @media (max-width: 640px) {
-    .slide {
-      padding: 28px 18px;
-      min-height: auto;
-      min-height: 100dvh;
-    }
-    .cover-badge {
-      font-size: 11px;
-      padding: 4px 14px;
-      margin-bottom: 24px;
-      letter-spacing: 1px;
-    }
-    .cover-title {
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-    .cover-subtitle {
-      font-size: 15px;
-      margin-bottom: 32px;
-    }
-    .cover-meta {
-      flex-wrap: wrap;
-      gap: 8px 16px;
-      font-size: 12px;
-      justify-content: center;
-    }
-    .section-num {
-      font-size: 12px;
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-    }
-    .section-title {
-      font-size: 24px;
-      margin-bottom: 12px;
-    }
-    .section-desc {
-      font-size: 14px;
-      margin-bottom: 28px;
-    }
-    .protocol-card {
-      padding: 18px;
-    }
-    .protocol-card h3 {
-      font-size: 15px;
-    }
-    .protocol-card .card-num {
-      font-size: 36px;
-    }
-    .protocol-card .env-var {
-      font-size: 11px;
-    }
-    .protocol-card p {
-      font-size: 13px;
-    }
-    .provider-card {
-      padding: 14px 16px;
-      gap: 12px;
-    }
-    .provider-icon {
-      width: 36px;
-      height: 36px;
-      font-size: 16px;
-      border-radius: 8px;
-    }
-    .provider-name {
-      font-size: 14px;
-    }
-    .provider-protocol {
-      font-size: 11px;
-    }
-    .provider-desc {
-      font-size: 12px;
-    }
-    .category-label {
-      font-size: 16px;
-    }
-    .matrix-table {
-      font-size: 12px;
-    }
-    .matrix-table th {
-      padding: 10px 8px;
-      font-size: 11px;
-    }
-    .matrix-table td {
-      padding: 8px;
-      font-size: 12px;
-    }
-    .arch-option {
-      padding: 20px 16px;
-    }
-    .arch-label {
-      font-size: 11px;
-    }
-    .arch-title {
-      font-size: 16px;
-    }
-    .arch-flow {
-      font-size: 12px;
-      gap: 4px;
-    }
-    .arch-node {
-      padding: 6px 10px;
-      font-size: 11px;
-    }
-    .arch-arrow {
-      font-size: 14px;
-    }
-    .arch-pros {
-      font-size: 12px;
-    }
-    .timeline-item {
-      padding: 16px;
-    }
-    .timeline-phase {
-      font-size: 11px;
-    }
-    .timeline-title {
-      font-size: 15px;
-    }
-    .timeline-desc {
-      font-size: 12px;
-    }
-    .code-block {
-      font-size: 12px;
-      padding: 14px;
-    }
-    .code-block .code-title {
-      font-size: 11px;
-      padding: 6px 12px;
-    }
-    .code-block.has-title {
-      padding-top: 38px;
-    }
-    .insight-grid {
-      gap: 12px;
-    }
-    .warning-box {
-      font-size: 12px;
-      padding: 12px 14px;
-    }
-    .slide-footer {
-      font-size: 10px;
-    }
-    /* Fix inline grid styles in HTML */
-    [style*="grid-template-columns: 1fr 1fr"] {
-      grid-template-columns: 1fr !important;
-    }
-    [style*="font-size: 42px"] {
-      font-size: 24px !important;
-    }
-    [style*="margin-bottom: 48px"] {
-      margin-bottom: 24px !important;
-    }
-    [style*="gap: 24px"] {
-      gap: 14px !important;
-    }
-  }
-
-  /* === Animations === */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease;
-  }
-
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
   /* === Warning Box === */
   .warning-box {
     background: rgba(245, 158, 11, 0.08);
@@ -882,26 +681,220 @@
     flex-shrink: 0;
     margin-top: 1px;
   }
+
+  /* === Footer === */
+  .slide-footer {
+    position: absolute;
+    bottom: 24px; left: 80px; right: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .page-num {
+    font-family: "SF Mono", monospace;
+  }
+
+  /* === Navigation Arrows (Desktop) === */
+  .nav-arrows {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+  }
+
+  .nav-arrow {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all .2s;
+  }
+
+  .nav-arrow:hover {
+    background: rgba(59,130,246,.15);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+
+  .nav-arrow.disabled {
+    opacity: .2;
+    pointer-events: none;
+  }
+
+  /* === Tablet === */
+  @media (max-width: 1024px) {
+    .slide { padding: 40px; }
+    .cover-title { font-size: 40px; }
+    .section-title { font-size: 32px; }
+    .protocol-grid { grid-template-columns: 1fr; }
+    .provider-cards { grid-template-columns: 1fr; }
+    .arch-container { flex-direction: column; }
+    .timeline { flex-direction: column; gap: 24px; }
+    .timeline::before { display: none; }
+    .insight-grid { grid-template-columns: 1fr; }
+    .nav { display: none; }
+    .slide-footer { left: 40px; right: 40px; }
+  }
+
+  /* === Mobile === */
+  @media (max-width: 640px) {
+    .slide {
+      padding: 24px 18px 60px;
+      justify-content: flex-start;
+      padding-top: 36px;
+    }
+    .cover-badge {
+      font-size: 11px;
+      padding: 4px 14px;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+    }
+    .cover-title {
+      font-size: 26px;
+      margin-bottom: 12px;
+    }
+    .cover-subtitle {
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+    .cover-meta {
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      font-size: 11px;
+    }
+    .section-num {
+      font-size: 11px;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .section-desc {
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .protocol-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 16px; }
+    .protocol-card { padding: 16px; }
+    .protocol-card h3 { font-size: 14px; }
+    .protocol-card .card-num { font-size: 32px; }
+    .protocol-card .env-var { font-size: 10px; }
+    .protocol-card p { font-size: 12px; }
+    .provider-cards { grid-template-columns: 1fr; gap: 10px; }
+    .provider-card { padding: 12px 14px; gap: 10px; }
+    .provider-icon { width: 34px; height: 34px; font-size: 15px; border-radius: 8px; }
+    .provider-info h4 { font-size: 13px; }
+    .provider-info .endpoint { font-size: 10px; }
+    .provider-info .models { font-size: 11px; }
+    .category-label { font-size: 14px; }
+    .provider-category { margin-bottom: 12px; }
+    .matrix-table { font-size: 11px; }
+    .matrix-table th { padding: 8px 6px; font-size: 10px; }
+    .matrix-table td { padding: 6px; font-size: 11px; }
+    .arch-container { flex-direction: column; gap: 16px; margin-top: 20px; }
+    .arch-option { padding: 16px; }
+    .arch-label { font-size: 10px; }
+    .arch-title { font-size: 16px; margin-bottom: 10px; }
+    .arch-node { padding: 6px 10px; font-size: 11px; }
+    .arch-arrow { font-size: 14px; }
+    .arch-pros li { font-size: 11px; }
+    .timeline { flex-direction: column; gap: 16px; margin-top: 20px; }
+    .timeline::before { display: none; }
+    .timeline-item { padding: 12px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); }
+    .timeline-dot { margin: 0 auto 8px; width: 12px; height: 12px; }
+    .timeline-phase { font-size: 10px; }
+    .timeline-title { font-size: 14px; margin-bottom: 6px; }
+    .timeline-desc { font-size: 11px; }
+    .code-block { font-size: 11px; padding: 12px; }
+    .code-block .code-title { font-size: 10px; padding: 4px 10px; }
+    .code-block.has-title { padding-top: 34px; }
+    .insight-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+    .insight-card { padding: 12px 8px; }
+    .insight-icon { font-size: 22px; margin-bottom: 4px; }
+    .insight-num { font-size: 22px; }
+    .insight-label { font-size: 11px; }
+    .warning-box { font-size: 12px; padding: 10px 12px; margin-top: 14px; }
+    .warning-icon { font-size: 14px; }
+    .slide-footer { left: 18px; right: 18px; bottom: 36px; font-size: 10px; }
+    .nav-arrows { display: none; }
+    .mobile-ind { display: flex; }
+    .page-counter { bottom: 36px; right: 18px; font-size: 10px; }
+    /* Override inline grid styles */
+    [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+    [style*="font-size: 42px"] { font-size: 22px !important; }
+    [style*="margin-bottom: 48px"] { margin-bottom: 20px !important; }
+    [style*="gap: 24px"] { gap: 12px !important; }
+    [style*="gap: 40px"] { gap: 16px !important; }
+    .slide-cover .slide-footer { bottom: 36px; }
+    .slide-cover { justify-content: center; padding-top: 24px; }
+  }
+
+  /* Scroll hint for overflowing slides on mobile */
+  .scroll-hint {
+    display: none;
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 150;
+    color: var(--text-muted);
+    font-size: 10px;
+    animation: scrollHintPulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes scrollHintPulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.8; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Navigation Dots -->
+<!-- Navigation Dots (Desktop) -->
 <nav class="nav" id="nav">
-  <button class="nav-dot active" onclick="scrollToSlide(0)" title="Cover"></button>
-  <button class="nav-dot" onclick="scrollToSlide(1)" title="Background"></button>
-  <button class="nav-dot" onclick="scrollToSlide(2)" title="4 Protocols"></button>
-  <button class="nav-dot" onclick="scrollToSlide(3)" title="Direct Support"></button>
-  <button class="nav-dot" onclick="scrollToSlide(4)" title="Gateway Support"></button>
-  <button class="nav-dot" onclick="scrollToSlide(5)" title="Compatibility Matrix"></button>
-  <button class="nav-dot" onclick="scrollToSlide(6)" title="Architecture"></button>
-  <button class="nav-dot" onclick="scrollToSlide(7)" title="Config Examples"></button>
-  <button class="nav-dot" onclick="scrollToSlide(8)" title="Lenovo Plan"></button>
-  <button class="nav-dot" onclick="scrollToSlide(9)" title="Summary"></button>
+  <button class="nav-dot active" data-slide="0" title="Cover"></button>
+  <button class="nav-dot" data-slide="1" title="Background"></button>
+  <button class="nav-dot" data-slide="2" title="4 Protocols"></button>
+  <button class="nav-dot" data-slide="3" title="Direct Support"></button>
+  <button class="nav-dot" data-slide="4" title="Gateway Support"></button>
+  <button class="nav-dot" data-slide="5" title="Compatibility Matrix"></button>
+  <button class="nav-dot" data-slide="6" title="Architecture"></button>
+  <button class="nav-dot" data-slide="7" title="Config Examples"></button>
+  <button class="nav-dot" data-slide="8" title="Lenovo Plan"></button>
+  <button class="nav-dot" data-slide="9" title="Summary"></button>
 </nav>
 
+<!-- Mobile Indicator -->
+<div class="mobile-ind" id="mobileInd"></div>
+
+<!-- Page Counter -->
+<div class="page-counter" id="pageCounter">01 / 10</div>
+
+<!-- Nav Arrows (Desktop) -->
+<div class="nav-arrows">
+  <button class="nav-arrow disabled" id="prevBtn" title="Previous">&#8249;</button>
+  <button class="nav-arrow" id="nextBtn" title="Next">&#8250;</button>
+</div>
+
+<!-- === SLIDES === -->
+<div class="deck" id="deck">
+
 <!-- Slide 0: Cover -->
-<section class="slide slide-cover" id="slide-0">
+<section class="slide slide-cover active" id="slide-0">
   <div class="cover-content">
     <div class="cover-badge">Technical Report</div>
     <h1 class="cover-title">Claude Code<br>国内大模型接入方案</h1>
@@ -922,35 +915,33 @@
 
 <!-- Slide 1: Background -->
 <section class="slide" id="slide-1">
-  <div class="fade-in">
-    <div class="section-num">01 / Background</div>
-    <h2 class="section-title">背景与目标</h2>
-    <p class="section-desc">Claude Code 是 Anthropic 官方 AI 编程 CLI 工具。在国内企业环境中，直连海外 API 存在网络不稳定、合规风险等问题。本方案调研国内大模型厂商的协议兼容性，为企业内网部署提供可行路径。</p>
+  <div class="section-num">01 / Background</div>
+  <h2 class="section-title">背景与目标</h2>
+  <p class="section-desc">Claude Code 是 Anthropic 官方 AI 编程 CLI 工具。在国内企业环境中，直连海外 API 存在网络不稳定、合规风险等问题。本方案调研国内大模型厂商的协议兼容性，为企业内网部署提供可行路径。</p>
 
-    <div class="insight-grid">
-      <div class="insight-card">
-        <span class="insight-icon" style="color: var(--accent-blue);">4</span>
-        <div class="insight-num" style="color: var(--accent-blue);">种</div>
-        <div class="insight-label">原生 API 协议</div>
-      </div>
-      <div class="insight-card">
-        <span class="insight-icon" style="color: var(--accent-green);">4</span>
-        <div class="insight-num" style="color: var(--accent-green);">家</div>
-        <div class="insight-label">国内厂商直接兼容</div>
-      </div>
-      <div class="insight-card">
-        <span class="insight-icon" style="color: var(--accent-purple);">10+</span>
-        <div class="insight-num" style="color: var(--accent-purple);">家</div>
-        <div class="insight-label">通过网关可接入</div>
-      </div>
+  <div class="insight-grid">
+    <div class="insight-card">
+      <span class="insight-icon" style="color: var(--accent-blue);">4</span>
+      <div class="insight-num" style="color: var(--accent-blue);">种</div>
+      <div class="insight-label">原生 API 协议</div>
     </div>
+    <div class="insight-card">
+      <span class="insight-icon" style="color: var(--accent-green);">4</span>
+      <div class="insight-num" style="color: var(--accent-green);">家</div>
+      <div class="insight-label">国内厂商直接兼容</div>
+    </div>
+    <div class="insight-card">
+      <span class="insight-icon" style="color: var(--accent-purple);">10+</span>
+      <div class="insight-num" style="color: var(--accent-purple);">家</div>
+      <div class="insight-label">通过网关可接入</div>
+    </div>
+  </div>
 
-    <div class="warning-box">
-      <span class="warning-icon">!</span>
-      <div>
-        <strong>核心发现</strong>：只要厂商 API 兼容 Anthropic Messages API 格式，即可通过一个环境变量
-        <code style="color: var(--accent-cyan);">ANTHROPIC_BASE_URL</code> 直接接入 Claude Code，无需任何中间件。
-      </div>
+  <div class="warning-box">
+    <span class="warning-icon">!</span>
+    <div>
+      <strong>核心发现</strong>：只要厂商 API 兼容 Anthropic Messages API 格式，即可通过一个环境变量
+      <code style="color: var(--accent-cyan);">ANTHROPIC_BASE_URL</code> 直接接入 Claude Code，无需任何中间件。
     </div>
   </div>
   <div class="slide-footer">
@@ -961,42 +952,40 @@
 
 <!-- Slide 2: Four Protocols -->
 <section class="slide" id="slide-2">
-  <div class="fade-in">
-    <div class="section-num">02 / Protocols</div>
-    <h2 class="section-title">Claude Code 四种 API 协议</h2>
-    <p class="section-desc">Claude Code 原生支持四种不同的 API 协议接入方式，覆盖主流云平台。</p>
+  <div class="section-num">02 / Protocols</div>
+  <h2 class="section-title">Claude Code 四种 API 协议</h2>
+  <p class="section-desc">Claude Code 原生支持四种不同的 API 协议接入方式，覆盖主流云平台。</p>
 
-    <div class="protocol-grid">
-      <div class="protocol-card">
-        <span class="card-num">01</span>
-        <h3>Anthropic Messages API</h3>
-        <span class="env-var">ANTHROPIC_BASE_URL</span>
-        <p>Anthropic 原生协议。国内兼容厂商可直接替换端点地址，最简单的接入方式。支持完整的 Messages API 功能集。</p>
-      </div>
-      <div class="protocol-card">
-        <span class="card-num">02</span>
-        <h3>AWS Bedrock</h3>
-        <span class="env-var">CLAUDE_CODE_USE_BEDROCK=1</span>
-        <p>通过 AWS Bedrock 托管 Claude 模型。适合已有 AWS 基础设施的企业。需要 IAM 认证，支持 VPC 私有端点。</p>
-      </div>
-      <div class="protocol-card">
-        <span class="card-num">03</span>
-        <h3>Google Vertex AI</h3>
-        <span class="env-var">CLAUDE_CODE_USE_VERTEX=1</span>
-        <p>通过 Google Cloud Vertex AI 访问 Claude。适合 GCP 环境企业。支持 Google IAM 和 VPC Service Controls。</p>
-      </div>
-      <div class="protocol-card">
-        <span class="card-num">04</span>
-        <h3>Azure AI Foundry</h3>
-        <span class="env-var">CLAUDE_CODE_USE_FOUNDRY=1</span>
-        <p>通过 Microsoft Azure AI Foundry 接入。适合 Azure 环境企业。支持 Azure AD 认证和 Private Endpoints。</p>
-      </div>
+  <div class="protocol-grid">
+    <div class="protocol-card">
+      <span class="card-num">01</span>
+      <h3>Anthropic Messages API</h3>
+      <span class="env-var">ANTHROPIC_BASE_URL</span>
+      <p>Anthropic 原生协议。国内兼容厂商可直接替换端点地址，最简单的接入方式。支持完整的 Messages API 功能集。</p>
     </div>
+    <div class="protocol-card">
+      <span class="card-num">02</span>
+      <h3>AWS Bedrock</h3>
+      <span class="env-var">CLAUDE_CODE_USE_BEDROCK=1</span>
+      <p>通过 AWS Bedrock 托管 Claude 模型。适合已有 AWS 基础设施的企业。需要 IAM 认证，支持 VPC 私有端点。</p>
+    </div>
+    <div class="protocol-card">
+      <span class="card-num">03</span>
+      <h3>Google Vertex AI</h3>
+      <span class="env-var">CLAUDE_CODE_USE_VERTEX=1</span>
+      <p>通过 Google Cloud Vertex AI 访问 Claude。适合 GCP 环境企业。支持 Google IAM 和 VPC Service Controls。</p>
+    </div>
+    <div class="protocol-card">
+      <span class="card-num">04</span>
+      <h3>Azure AI Foundry</h3>
+      <span class="env-var">CLAUDE_CODE_USE_FOUNDRY=1</span>
+      <p>通过 Microsoft Azure AI Foundry 接入。适合 Azure 环境企业。支持 Azure AD 认证和 Private Endpoints。</p>
+    </div>
+  </div>
 
-    <div class="warning-box" style="margin-top: 24px;">
-      <span class="warning-icon">!</span>
-      <div>此外还支持两种代理模式：<strong>Corporate Proxy</strong>（HTTPS_PROXY）和 <strong>LLM Gateway</strong>（如 LiteLLM），可叠加使用。</div>
-    </div>
+  <div class="warning-box">
+    <span class="warning-icon">!</span>
+    <div>此外还支持两种代理模式：<strong>Corporate Proxy</strong>（HTTPS_PROXY）和 <strong>LLM Gateway</strong>（如 LiteLLM），可叠加使用。</div>
   </div>
   <div class="slide-footer">
     <span>Claude Code China LLM Integration</span>
@@ -1006,53 +995,51 @@
 
 <!-- Slide 3: Direct Support Providers -->
 <section class="slide" id="slide-3">
-  <div class="fade-in">
-    <div class="section-num">03 / Direct Support</div>
-    <h2 class="section-title">直接兼容 Anthropic API 的国内厂商</h2>
-    <p class="section-desc">以下 4 家厂商原生提供 Anthropic Messages API 兼容端点，可零改造直接接入。</p>
+  <div class="section-num">03 / Direct Support</div>
+  <h2 class="section-title">直接兼容 Anthropic API 的国内厂商</h2>
+  <p class="section-desc">以下 4 家厂商原生提供 Anthropic Messages API 兼容端点，可零改造直接接入。</p>
 
-    <div class="provider-category">
-      <span class="category-dot" style="background: var(--accent-green);"></span>
-      <span class="category-label">直接接入 &mdash; 无需中间件</span>
-      <span class="provider-badge badge-direct">DIRECT</span>
+  <div class="provider-category">
+    <span class="category-dot" style="background: var(--accent-green);"></span>
+    <span class="category-label">直接接入 &mdash; 无需中间件</span>
+    <span class="provider-badge badge-direct">DIRECT</span>
+  </div>
+
+  <div class="provider-cards">
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #ff6a00, #ee0979);">A</div>
+      <div class="provider-info">
+        <h4>阿里云百炼 (DashScope)</h4>
+        <div class="endpoint">dashscope.aliyuncs.com/compatible-mode</div>
+        <div class="models">Qwen 全系列 / 通义千问 / 第三方模型聚合</div>
+        <div style="margin-top: 6px;"><span class="provider-badge badge-direct">最全面 / 企业级 SLA</span></div>
+      </div>
     </div>
-
-    <div class="provider-cards">
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #ff6a00, #ee0979);">A</div>
-        <div class="provider-info">
-          <h4>阿里云百炼 (DashScope)</h4>
-          <div class="endpoint">dashscope.aliyuncs.com/compatible-mode</div>
-          <div class="models">Qwen 全系列 / 通义千问 / 第三方模型聚合</div>
-          <div style="margin-top: 6px;"><span class="provider-badge badge-direct">最全面 / 企业级 SLA</span></div>
-        </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">M</div>
+      <div class="provider-info">
+        <h4>MiniMax</h4>
+        <div class="endpoint">api.minimax.chat</div>
+        <div class="models">M2.5-Lite / M2.1 / M2</div>
+        <div style="margin-top: 6px;"><span class="provider-badge badge-direct">官方 Anthropic API 文档</span></div>
       </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">M</div>
-        <div class="provider-info">
-          <h4>MiniMax</h4>
-          <div class="endpoint">api.minimax.chat</div>
-          <div class="models">M2.5-Lite / M2.1 / M2</div>
-          <div style="margin-top: 6px;"><span class="provider-badge badge-direct">官方 Anthropic API 文档</span></div>
-        </div>
+    </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #11998e, #38ef7d);">D</div>
+      <div class="provider-info">
+        <h4>DeepSeek</h4>
+        <div class="endpoint">api.deepseek.com</div>
+        <div class="models">DeepSeek V3.2 / V3 / R1</div>
+        <div style="margin-top: 6px;"><span class="provider-badge badge-direct">思维链支持 / 性价比高</span></div>
       </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #11998e, #38ef7d);">D</div>
-        <div class="provider-info">
-          <h4>DeepSeek</h4>
-          <div class="endpoint">api.deepseek.com</div>
-          <div class="models">DeepSeek V3.2 / V3 / R1</div>
-          <div style="margin-top: 6px;"><span class="provider-badge badge-direct">思维链支持 / 性价比高</span></div>
-        </div>
-      </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">S</div>
-        <div class="provider-info">
-          <h4>ModelScope (阿里达摩院)</h4>
-          <div class="endpoint">api-inference.modelscope.cn</div>
-          <div class="models">多家模型聚合</div>
-          <div style="margin-top: 6px;"><span class="provider-badge badge-direct">每天免费 2000 次调用</span></div>
-        </div>
+    </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">S</div>
+      <div class="provider-info">
+        <h4>ModelScope (阿里达摩院)</h4>
+        <div class="endpoint">api-inference.modelscope.cn</div>
+        <div class="models">多家模型聚合</div>
+        <div style="margin-top: 6px;"><span class="provider-badge badge-direct">每天免费 2000 次调用</span></div>
       </div>
     </div>
   </div>
@@ -1064,65 +1051,63 @@
 
 <!-- Slide 4: Gateway Support Providers -->
 <section class="slide" id="slide-4">
-  <div class="fade-in">
-    <div class="section-num">04 / Gateway Support</div>
-    <h2 class="section-title">需要 LiteLLM 网关转换的厂商</h2>
-    <p class="section-desc">以下厂商仅提供 OpenAI Chat Completions API 格式，需通过 LiteLLM 网关协议转换后接入。</p>
+  <div class="section-num">04 / Gateway Support</div>
+  <h2 class="section-title">需要 LiteLLM 网关转换的厂商</h2>
+  <p class="section-desc">以下厂商仅提供 OpenAI Chat Completions API 格式，需通过 LiteLLM 网关协议转换后接入。</p>
 
-    <div class="provider-category">
-      <span class="category-dot" style="background: var(--accent-amber);"></span>
-      <span class="category-label">网关接入 &mdash; 需要 LiteLLM 转换</span>
-      <span class="provider-badge badge-gateway">GATEWAY</span>
+  <div class="provider-category">
+    <span class="category-dot" style="background: var(--accent-amber);"></span>
+    <span class="category-label">网关接入 &mdash; 需要 LiteLLM 转换</span>
+    <span class="provider-badge badge-gateway">GATEWAY</span>
+  </div>
+
+  <div class="provider-cards">
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #fc5c7d, #6a82fb);">B</div>
+      <div class="provider-info">
+        <h4>字节跳动 / 豆包 (Doubao)</h4>
+        <div class="endpoint">ark.cn-beijing.volces.com/api/v3</div>
+        <div class="models">豆包 Pro / Lite</div>
+      </div>
     </div>
-
-    <div class="provider-cards">
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #fc5c7d, #6a82fb);">B</div>
-        <div class="provider-info">
-          <h4>字节跳动 / 豆包 (Doubao)</h4>
-          <div class="endpoint">ark.cn-beijing.volces.com/api/v3</div>
-          <div class="models">豆包 Pro / Lite</div>
-        </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #2196f3, #1976d2);">W</div>
+      <div class="provider-info">
+        <h4>百度 / 文心一言 (ERNIE)</h4>
+        <div class="endpoint">aip.baidubce.com</div>
+        <div class="models">ERNIE 4.0 / 3.5</div>
       </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #2196f3, #1976d2);">W</div>
-        <div class="provider-info">
-          <h4>百度 / 文心一言 (ERNIE)</h4>
-          <div class="endpoint">aip.baidubce.com</div>
-          <div class="models">ERNIE 4.0 / 3.5</div>
-        </div>
+    </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">Z</div>
+      <div class="provider-info">
+        <h4>智谱 AI / GLM</h4>
+        <div class="endpoint">open.bigmodel.cn/api/paas/v4</div>
+        <div class="models">GLM-4 / GLM-4V</div>
       </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">Z</div>
-        <div class="provider-info">
-          <h4>智谱 AI / GLM</h4>
-          <div class="endpoint">open.bigmodel.cn/api/paas/v4</div>
-          <div class="models">GLM-4 / GLM-4V</div>
-        </div>
+    </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">K</div>
+      <div class="provider-info">
+        <h4>月之暗面 / Kimi (Moonshot)</h4>
+        <div class="endpoint">api.moonshot.cn/v1</div>
+        <div class="models">moonshot-v1-128k</div>
       </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">K</div>
-        <div class="provider-info">
-          <h4>月之暗面 / Kimi (Moonshot)</h4>
-          <div class="endpoint">api.moonshot.cn/v1</div>
-          <div class="models">moonshot-v1-128k</div>
-        </div>
+    </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">S</div>
+      <div class="provider-info">
+        <h4>硅基流动 (SiliconFlow)</h4>
+        <div class="endpoint">api.siliconflow.cn/v1</div>
+        <div class="models">多家模型聚合，价格低</div>
       </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">S</div>
-        <div class="provider-info">
-          <h4>硅基流动 (SiliconFlow)</h4>
-          <div class="endpoint">api.siliconflow.cn/v1</div>
-          <div class="models">多家模型聚合，价格低</div>
-        </div>
-      </div>
-      <div class="provider-card">
-        <div class="provider-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">Y</div>
-        <div class="provider-info">
-          <h4>零一万物 / Yi</h4>
-          <div class="endpoint">api.lingyiwanwu.com/v1</div>
-          <div class="models">Yi-Large / Yi-Medium</div>
-        </div>
+    </div>
+    <div class="provider-card">
+      <div class="provider-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">Y</div>
+      <div class="provider-info">
+        <h4>零一万物 / Yi</h4>
+        <div class="endpoint">api.lingyiwanwu.com/v1</div>
+        <div class="models">Yi-Large / Yi-Medium</div>
       </div>
     </div>
   </div>
@@ -1134,123 +1119,121 @@
 
 <!-- Slide 5: Compatibility Matrix -->
 <section class="slide" id="slide-5">
-  <div class="fade-in">
-    <div class="section-num">05 / Matrix</div>
-    <h2 class="section-title">协议兼容性矩阵</h2>
-    <p class="section-desc">国内主要厂商对 Claude Code 四种 API 协议的支持情况一览。</p>
+  <div class="section-num">05 / Matrix</div>
+  <h2 class="section-title">协议兼容性矩阵</h2>
+  <p class="section-desc">国内主要厂商对 Claude Code 四种 API 协议的支持情况一览。</p>
 
-    <div class="matrix-wrapper">
-      <table class="matrix-table">
-        <thead>
-          <tr>
-            <th style="min-width: 140px;">厂商</th>
-            <th>Anthropic<br>Messages API</th>
-            <th>OpenAI<br>Compatible</th>
-            <th>AWS<br>Bedrock</th>
-            <th>Google<br>Vertex</th>
-            <th>Azure<br>Foundry</th>
-            <th>接入方式</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>阿里云百炼</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-direct">直接</span></td>
-          </tr>
-          <tr>
-            <td>MiniMax</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-direct">直接</span></td>
-          </tr>
-          <tr>
-            <td>DeepSeek</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-direct">直接</span></td>
-          </tr>
-          <tr>
-            <td>ModelScope</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-direct">直接</span></td>
-          </tr>
-          <tr>
-            <td>字节 / 豆包</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-gateway">网关</span></td>
-          </tr>
-          <tr>
-            <td>百度 / 文心</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-gateway">网关</span></td>
-          </tr>
-          <tr>
-            <td>智谱 / GLM</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-gateway">网关</span></td>
-          </tr>
-          <tr>
-            <td>月之暗面 / Kimi</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-gateway">网关</span></td>
-          </tr>
-          <tr>
-            <td>硅基流动</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-gateway">网关</span></td>
-          </tr>
-          <tr>
-            <td>零一万物 / Yi</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-yes">&#10003;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td class="cell-no">&mdash;</td>
-            <td><span class="provider-badge badge-gateway">网关</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="matrix-wrapper">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="min-width: 140px;">厂商</th>
+          <th>Anthropic<br>Messages API</th>
+          <th>OpenAI<br>Compatible</th>
+          <th>AWS<br>Bedrock</th>
+          <th>Google<br>Vertex</th>
+          <th>Azure<br>Foundry</th>
+          <th>接入方式</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>阿里云百炼</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-direct">直接</span></td>
+        </tr>
+        <tr>
+          <td>MiniMax</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-direct">直接</span></td>
+        </tr>
+        <tr>
+          <td>DeepSeek</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-direct">直接</span></td>
+        </tr>
+        <tr>
+          <td>ModelScope</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-direct">直接</span></td>
+        </tr>
+        <tr>
+          <td>字节 / 豆包</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-gateway">网关</span></td>
+        </tr>
+        <tr>
+          <td>百度 / 文心</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-gateway">网关</span></td>
+        </tr>
+        <tr>
+          <td>智谱 / GLM</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-gateway">网关</span></td>
+        </tr>
+        <tr>
+          <td>月之暗面 / Kimi</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-gateway">网关</span></td>
+        </tr>
+        <tr>
+          <td>硅基流动</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-gateway">网关</span></td>
+        </tr>
+        <tr>
+          <td>零一万物 / Yi</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-yes">&#10003;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td class="cell-no">&mdash;</td>
+          <td><span class="provider-badge badge-gateway">网关</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-    <div class="warning-box" style="margin-top: 24px;">
-      <span class="warning-icon">!</span>
-      <div><strong>关键结论</strong>：目前无国内厂商支持 AWS Bedrock / Google Vertex / Azure Foundry 协议。Anthropic Messages API 是唯一的直连途径。</div>
-    </div>
+  <div class="warning-box" style="margin-top: 24px;">
+    <span class="warning-icon">!</span>
+    <div><strong>关键结论</strong>：目前无国内厂商支持 AWS Bedrock / Google Vertex / Azure Foundry 协议。Anthropic Messages API 是唯一的直连途径。</div>
   </div>
   <div class="slide-footer">
     <span>Claude Code China LLM Integration</span>
@@ -1260,71 +1243,69 @@
 
 <!-- Slide 6: Architecture Options -->
 <section class="slide" id="slide-6">
-  <div class="fade-in">
-    <div class="section-num">06 / Architecture</div>
-    <h2 class="section-title">三种部署架构</h2>
-    <p class="section-desc">根据企业需求选择合适的部署方案。</p>
+  <div class="section-num">06 / Architecture</div>
+  <h2 class="section-title">三种部署架构</h2>
+  <p class="section-desc">根据企业需求选择合适的部署方案。</p>
 
-    <div class="arch-container">
-      <div class="arch-option">
-        <div class="arch-label">方案 A</div>
-        <div class="arch-title">直连模式</div>
-        <div class="arch-flow">
-          <div class="arch-node">Claude Code CLI</div>
-          <div class="arch-arrow">&#8595;</div>
-          <div class="arch-node" style="border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08);">国内厂商 API<br><small style="color: var(--text-muted);">阿里云 / DeepSeek / MiniMax</small></div>
-        </div>
-        <ul class="arch-pros">
-          <li>零中间件，配置最简</li>
-          <li>延迟最低</li>
-          <li>运维成本为零</li>
-        </ul>
-        <ul class="arch-pros arch-cons" style="margin-top: 8px;">
-          <li>绑定单一厂商</li>
-          <li>缺乏统一管理</li>
-        </ul>
+  <div class="arch-container">
+    <div class="arch-option">
+      <div class="arch-label">方案 A</div>
+      <div class="arch-title">直连模式</div>
+      <div class="arch-flow">
+        <div class="arch-node">Claude Code CLI</div>
+        <div class="arch-arrow">&#8595;</div>
+        <div class="arch-node" style="border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08);">国内厂商 API<br><small style="color: var(--text-muted);">阿里云 / DeepSeek / MiniMax</small></div>
       </div>
+      <ul class="arch-pros">
+        <li>零中间件，配置最简</li>
+        <li>延迟最低</li>
+        <li>运维成本为零</li>
+      </ul>
+      <ul class="arch-pros arch-cons" style="margin-top: 8px;">
+        <li>绑定单一厂商</li>
+        <li>缺乏统一管理</li>
+      </ul>
+    </div>
 
-      <div class="arch-option recommended">
-        <div class="arch-label">方案 B</div>
-        <div class="arch-title">LiteLLM 网关</div>
-        <div class="arch-flow">
-          <div class="arch-node">Claude Code CLI</div>
-          <div class="arch-arrow">&#8595;</div>
-          <div class="arch-node" style="border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.1);">LiteLLM Gateway<br><small style="color: var(--text-muted);">协议转换 + 负载均衡</small></div>
-          <div class="arch-arrow">&#8595;</div>
-          <div class="arch-node" style="border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08);">多家厂商 API</div>
-        </div>
-        <ul class="arch-pros">
-          <li>多厂商负载均衡</li>
-          <li>成本追踪 + 密钥管理</li>
-          <li>故障自动切换</li>
-        </ul>
-        <ul class="arch-pros arch-cons" style="margin-top: 8px;">
-          <li>需部署 LiteLLM 实例</li>
-        </ul>
+    <div class="arch-option recommended">
+      <div class="arch-label">方案 B</div>
+      <div class="arch-title">LiteLLM 网关</div>
+      <div class="arch-flow">
+        <div class="arch-node">Claude Code CLI</div>
+        <div class="arch-arrow">&#8595;</div>
+        <div class="arch-node" style="border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.1);">LiteLLM Gateway<br><small style="color: var(--text-muted);">协议转换 + 负载均衡</small></div>
+        <div class="arch-arrow">&#8595;</div>
+        <div class="arch-node" style="border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08);">多家厂商 API</div>
       </div>
+      <ul class="arch-pros">
+        <li>多厂商负载均衡</li>
+        <li>成本追踪 + 密钥管理</li>
+        <li>故障自动切换</li>
+      </ul>
+      <ul class="arch-pros arch-cons" style="margin-top: 8px;">
+        <li>需部署 LiteLLM 实例</li>
+      </ul>
+    </div>
 
-      <div class="arch-option">
-        <div class="arch-label">方案 C</div>
-        <div class="arch-title">私有化部署</div>
-        <div class="arch-flow">
-          <div class="arch-node">Claude Code CLI</div>
-          <div class="arch-arrow">&#8595;</div>
-          <div class="arch-node" style="border-color: rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.08);">内网 LiteLLM</div>
-          <div class="arch-arrow">&#8595;</div>
-          <div class="arch-node" style="border-color: rgba(236, 72, 153, 0.3); background: rgba(236, 72, 153, 0.08);">私有化模型<br><small style="color: var(--text-muted);">Qwen-72B / DeepSeek-V3</small></div>
-        </div>
-        <ul class="arch-pros">
-          <li>数据不出内网</li>
-          <li>满足合规要求</li>
-          <li>完全自主可控</li>
-        </ul>
-        <ul class="arch-pros arch-cons" style="margin-top: 8px;">
-          <li>需要 GPU 算力</li>
-          <li>运维成本较高</li>
-        </ul>
+    <div class="arch-option">
+      <div class="arch-label">方案 C</div>
+      <div class="arch-title">私有化部署</div>
+      <div class="arch-flow">
+        <div class="arch-node">Claude Code CLI</div>
+        <div class="arch-arrow">&#8595;</div>
+        <div class="arch-node" style="border-color: rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.08);">内网 LiteLLM</div>
+        <div class="arch-arrow">&#8595;</div>
+        <div class="arch-node" style="border-color: rgba(236, 72, 153, 0.3); background: rgba(236, 72, 153, 0.08);">私有化模型<br><small style="color: var(--text-muted);">Qwen-72B / DeepSeek-V3</small></div>
       </div>
+      <ul class="arch-pros">
+        <li>数据不出内网</li>
+        <li>满足合规要求</li>
+        <li>完全自主可控</li>
+      </ul>
+      <ul class="arch-pros arch-cons" style="margin-top: 8px;">
+        <li>需要 GPU 算力</li>
+        <li>运维成本较高</li>
+      </ul>
     </div>
   </div>
   <div class="slide-footer">
@@ -1335,52 +1316,50 @@
 
 <!-- Slide 7: Config Examples -->
 <section class="slide" id="slide-7">
-  <div class="fade-in">
-    <div class="section-num">07 / Configuration</div>
-    <h2 class="section-title">快速配置示例</h2>
-    <p class="section-desc">三行命令即可完成接入配置。</p>
+  <div class="section-num">07 / Configuration</div>
+  <h2 class="section-title">快速配置示例</h2>
+  <p class="section-desc">三行命令即可完成接入配置。</p>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-      <div>
-        <div class="code-block has-title">
-          <div class="code-title">Direct: Alibaba Cloud Bailian</div>
-          <span class="code-comment"># 直连阿里云百炼 (推荐)</span><br>
-          <span class="code-key">export</span> <span class="code-env">ANTHROPIC_BASE_URL</span>=<span class="code-string">"https://dashscope.aliyuncs.com/compatible-mode"</span><br>
-          <span class="code-key">export</span> <span class="code-env">ANTHROPIC_API_KEY</span>=<span class="code-string">"sk-your-key"</span><br>
-          <span class="code-key">export</span> <span class="code-env">ANTHROPIC_MODEL</span>=<span class="code-string">"qwen-max"</span><br>
-          <span class="code-key">claude</span>
-        </div>
-
-        <div class="code-block has-title" style="margin-top: 16px;">
-          <div class="code-title">Direct: DeepSeek</div>
-          <span class="code-comment"># 直连 DeepSeek (性价比高)</span><br>
-          <span class="code-key">export</span> <span class="code-env">ANTHROPIC_BASE_URL</span>=<span class="code-string">"https://api.deepseek.com"</span><br>
-          <span class="code-key">export</span> <span class="code-env">ANTHROPIC_API_KEY</span>=<span class="code-string">"sk-your-key"</span><br>
-          <span class="code-key">export</span> <span class="code-env">ANTHROPIC_MODEL</span>=<span class="code-string">"deepseek-chat"</span><br>
-          <span class="code-key">claude</span>
-        </div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <div>
+      <div class="code-block has-title">
+        <div class="code-title">Direct: Alibaba Cloud Bailian</div>
+        <span class="code-comment"># 直连阿里云百炼 (推荐)</span><br>
+        <span class="code-key">export</span> <span class="code-env">ANTHROPIC_BASE_URL</span>=<span class="code-string">"https://dashscope.aliyuncs.com/compatible-mode"</span><br>
+        <span class="code-key">export</span> <span class="code-env">ANTHROPIC_API_KEY</span>=<span class="code-string">"sk-your-key"</span><br>
+        <span class="code-key">export</span> <span class="code-env">ANTHROPIC_MODEL</span>=<span class="code-string">"qwen-max"</span><br>
+        <span class="code-key">claude</span>
       </div>
 
-      <div>
-        <div class="code-block has-title">
-          <div class="code-title">LiteLLM Gateway: config.yaml</div>
-          <span class="code-key">model_list</span>:<br>
-          &nbsp;&nbsp;<span class="code-comment"># 主力: 阿里云</span><br>
-          &nbsp;&nbsp;- <span class="code-key">model_name</span>: <span class="code-string">qwen-max</span><br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">litellm_params</span>:<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">model</span>: <span class="code-string">qwen-max</span><br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">api_base</span>: <span class="code-string">https://dashscope...</span><br>
-          <br>
-          &nbsp;&nbsp;<span class="code-comment"># 代码: DeepSeek</span><br>
-          &nbsp;&nbsp;- <span class="code-key">model_name</span>: <span class="code-string">deepseek-coder</span><br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">litellm_params</span>:<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">model</span>: <span class="code-string">deepseek-coder</span><br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">api_base</span>: <span class="code-string">https://api.deepseek...</span><br>
-          <br>
-          <span class="code-key">router_settings</span>:<br>
-          &nbsp;&nbsp;<span class="code-key">routing_strategy</span>: <span class="code-string">least-busy</span><br>
-          &nbsp;&nbsp;<span class="code-key">fallback_models</span>: <span class="code-string">[qwen-max, deepseek]</span>
-        </div>
+      <div class="code-block has-title" style="margin-top: 16px;">
+        <div class="code-title">Direct: DeepSeek</div>
+        <span class="code-comment"># 直连 DeepSeek (性价比高)</span><br>
+        <span class="code-key">export</span> <span class="code-env">ANTHROPIC_BASE_URL</span>=<span class="code-string">"https://api.deepseek.com"</span><br>
+        <span class="code-key">export</span> <span class="code-env">ANTHROPIC_API_KEY</span>=<span class="code-string">"sk-your-key"</span><br>
+        <span class="code-key">export</span> <span class="code-env">ANTHROPIC_MODEL</span>=<span class="code-string">"deepseek-chat"</span><br>
+        <span class="code-key">claude</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="code-block has-title">
+        <div class="code-title">LiteLLM Gateway: config.yaml</div>
+        <span class="code-key">model_list</span>:<br>
+        &nbsp;&nbsp;<span class="code-comment"># 主力: 阿里云</span><br>
+        &nbsp;&nbsp;- <span class="code-key">model_name</span>: <span class="code-string">qwen-max</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">litellm_params</span>:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">model</span>: <span class="code-string">qwen-max</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">api_base</span>: <span class="code-string">https://dashscope...</span><br>
+        <br>
+        &nbsp;&nbsp;<span class="code-comment"># 代码: DeepSeek</span><br>
+        &nbsp;&nbsp;- <span class="code-key">model_name</span>: <span class="code-string">deepseek-coder</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">litellm_params</span>:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">model</span>: <span class="code-string">deepseek-coder</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">api_base</span>: <span class="code-string">https://api.deepseek...</span><br>
+        <br>
+        <span class="code-key">router_settings</span>:<br>
+        &nbsp;&nbsp;<span class="code-key">routing_strategy</span>: <span class="code-string">least-busy</span><br>
+        &nbsp;&nbsp;<span class="code-key">fallback_models</span>: <span class="code-string">[qwen-max, deepseek]</span>
       </div>
     </div>
   </div>
@@ -1392,59 +1371,57 @@
 
 <!-- Slide 8: Lenovo Plan -->
 <section class="slide" id="slide-8">
-  <div class="fade-in">
-    <div class="section-num">08 / Enterprise Plan</div>
-    <h2 class="section-title">联想场景落地路径</h2>
-    <p class="section-desc">分三阶段逐步推进，从快速验证到规模化部署。</p>
+  <div class="section-num">08 / Enterprise Plan</div>
+  <h2 class="section-title">联想场景落地路径</h2>
+  <p class="section-desc">分三阶段逐步推进，从快速验证到规模化部署。</p>
 
-    <div class="timeline">
-      <div class="timeline-item">
-        <div class="timeline-phase">Phase 1</div>
-        <div class="timeline-dot" style="background: var(--accent-green);"></div>
-        <div class="timeline-title">快速验证<br><small style="color: var(--text-muted); font-weight: 400;">1-2 周</small></div>
-        <div class="timeline-desc">
-          选择阿里云百炼或 DeepSeek 直连。<br>
-          3 行环境变量配置，零基础设施改造。<br>
-          小团队试点验证可行性。
-        </div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-phase">Phase 2</div>
-        <div class="timeline-dot" style="background: var(--accent-blue);"></div>
-        <div class="timeline-title">规模化部署<br><small style="color: var(--text-muted); font-weight: 400;">1-2 月</small></div>
-        <div class="timeline-desc">
-          部署 LiteLLM 网关。<br>
-          多厂商接入 + 负载均衡 + 故障切换。<br>
-          统一密钥管理 + 成本追踪 + 审计日志。
-        </div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-phase">Phase 3</div>
-        <div class="timeline-dot" style="background: var(--accent-purple);"></div>
-        <div class="timeline-title">私有化<br><small style="color: var(--text-muted); font-weight: 400;">3-6 月</small></div>
-        <div class="timeline-desc">
-          内网部署 Qwen-72B 或 DeepSeek-V3。<br>
-          敏感代码走内网模型，非敏感走外网。<br>
-          满足数据安全合规要求。
-        </div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 1</div>
+      <div class="timeline-dot" style="background: var(--accent-green);"></div>
+      <div class="timeline-title">快速验证<br><small style="color: var(--text-muted); font-weight: 400;">1-2 周</small></div>
+      <div class="timeline-desc">
+        选择阿里云百炼或 DeepSeek 直连。<br>
+        3 行环境变量配置，零基础设施改造。<br>
+        小团队试点验证可行性。
       </div>
     </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 48px;">
-      <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 24px;">
-        <div style="font-size: 14px; color: var(--accent-green); font-weight: 600; margin-bottom: 12px;">Phase 1 推荐厂商</div>
-        <div style="font-size: 15px; line-height: 2;">
-          <strong>首选</strong>: 阿里云百炼 + Qwen &mdash; 企业级 SLA，模型最丰富<br>
-          <strong>备选</strong>: DeepSeek &mdash; 代码能力突出，性价比极高
-        </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 2</div>
+      <div class="timeline-dot" style="background: var(--accent-blue);"></div>
+      <div class="timeline-title">规模化部署<br><small style="color: var(--text-muted); font-weight: 400;">1-2 月</small></div>
+      <div class="timeline-desc">
+        部署 LiteLLM 网关。<br>
+        多厂商接入 + 负载均衡 + 故障切换。<br>
+        统一密钥管理 + 成本追踪 + 审计日志。
       </div>
-      <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 24px;">
-        <div style="font-size: 14px; color: var(--accent-amber); font-weight: 600; margin-bottom: 12px;">注意事项</div>
-        <div style="font-size: 15px; line-height: 2;">
-          API 兼容性需实测（tool_use / caching）<br>
-          模型代码能力与 Claude 仍有差距<br>
-          部分行业需等保认证厂商
-        </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 3</div>
+      <div class="timeline-dot" style="background: var(--accent-purple);"></div>
+      <div class="timeline-title">私有化<br><small style="color: var(--text-muted); font-weight: 400;">3-6 月</small></div>
+      <div class="timeline-desc">
+        内网部署 Qwen-72B 或 DeepSeek-V3。<br>
+        敏感代码走内网模型，非敏感走外网。<br>
+        满足数据安全合规要求。
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 48px;">
+    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 24px;">
+      <div style="font-size: 14px; color: var(--accent-green); font-weight: 600; margin-bottom: 12px;">Phase 1 推荐厂商</div>
+      <div style="font-size: 15px; line-height: 2;">
+        <strong>首选</strong>: 阿里云百炼 + Qwen &mdash; 企业级 SLA，模型最丰富<br>
+        <strong>备选</strong>: DeepSeek &mdash; 代码能力突出，性价比极高
+      </div>
+    </div>
+    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 24px;">
+      <div style="font-size: 14px; color: var(--accent-amber); font-weight: 600; margin-bottom: 12px;">注意事项</div>
+      <div style="font-size: 15px; line-height: 2;">
+        API 兼容性需实测（tool_use / caching）<br>
+        模型代码能力与 Claude 仍有差距<br>
+        部分行业需等保认证厂商
       </div>
     </div>
   </div>
@@ -1502,75 +1479,136 @@
   </div>
 </section>
 
+</div><!-- /deck -->
+
 <script>
-  // Scroll-based navigation
-  const slides = document.querySelectorAll('.slide');
-  const dots = document.querySelectorAll('.nav-dot');
+(function() {
+  var slides = document.querySelectorAll('.slide');
+  var dots = document.querySelectorAll('.nav-dot');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var counter = document.getElementById('pageCounter');
+  var mobileInd = document.getElementById('mobileInd');
+  var current = 0;
+  var total = slides.length;
+  var transitioning = false;
 
-  function scrollToSlide(index) {
-    slides[index].scrollIntoView({ behavior: 'smooth' });
+  // Build mobile indicator dots
+  for (var i = 0; i < total; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    mobileInd.appendChild(d);
   }
 
-  function updateNav() {
-    const scrollPos = window.scrollY + window.innerHeight / 2;
-    slides.forEach((slide, i) => {
-      const top = slide.offsetTop;
-      const bottom = top + slide.offsetHeight;
-      if (scrollPos >= top && scrollPos < bottom) {
-        dots.forEach(d => d.classList.remove('active'));
-        dots[i].classList.add('active');
-      }
-    });
+  function goToSlide(index) {
+    if (index < 0 || index >= total || index === current || transitioning) return;
+    transitioning = true;
+
+    // Deactivate current
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+
+    // Activate new
+    slides[index].classList.add('active');
+    slides[index].scrollTop = 0; // Reset internal scroll
+    dots[index].classList.add('active');
+
+    // Update counter
+    var num = String(index + 1).padStart(2, '0');
+    counter.textContent = num + ' / ' + String(total).padStart(2, '0');
+
+    // Update mobile indicator
+    var mDots = mobileInd.querySelectorAll('.dot');
+    for (var i = 0; i < mDots.length; i++) {
+      mDots[i].classList.toggle('active', i === index);
+    }
+
+    // Update arrow states
+    prevBtn.classList.toggle('disabled', index === 0);
+    nextBtn.classList.toggle('disabled', index === total - 1);
+
+    current = index;
+    setTimeout(function() { transitioning = false; }, 450);
   }
 
-  // Fade-in animations
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
+  // Desktop nav dots
+  dots.forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      goToSlide(parseInt(this.dataset.slide));
     });
-  }, { threshold: 0.15 });
+  });
 
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-  window.addEventListener('scroll', updateNav);
+  // Arrow buttons
+  prevBtn.addEventListener('click', function() { goToSlide(current - 1); });
+  nextBtn.addEventListener('click', function() { goToSlide(current + 1); });
 
   // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    const current = Array.from(dots).findIndex(d => d.classList.contains('active'));
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
       e.preventDefault();
-      if (current < slides.length - 1) scrollToSlide(current + 1);
-    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      goToSlide(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
       e.preventDefault();
-      if (current > 0) scrollToSlide(current - 1);
+      goToSlide(current - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      goToSlide(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      goToSlide(total - 1);
     }
   });
 
-  // Mobile: show slide indicator
-  (function(){
-    if(window.innerWidth > 640) return;
-    var ind = document.createElement('div');
-    ind.id = 'mobileInd';
-    ind.style.cssText = 'position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:6px;padding:6px 12px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-radius:20px;';
-    for(var i=0;i<slides.length;i++){
-      var d=document.createElement('div');
-      d.style.cssText='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .3s;';
-      if(i===0) d.style.background='rgba(59,130,246,.9)';
-      ind.appendChild(d);
-    }
-    document.body.appendChild(ind);
-    window.addEventListener('scroll',function(){
-      var sp=window.scrollY+window.innerHeight/2;
-      var ds=ind.children;
-      for(var i=0;i<slides.length;i++){
-        var t=slides[i].offsetTop,b=t+slides[i].offsetHeight;
-        ds[i].style.background=(sp>=t&&sp<b)?'rgba(59,130,246,.9)':'rgba(255,255,255,.25)';
-        ds[i].style.transform=(sp>=t&&sp<b)?'scale(1.4)':'scale(1)';
+  // Touch swipe (horizontal: left/right to navigate)
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var touchDeltaX = 0;
+
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchDeltaX = 0;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    touchDeltaX = e.touches[0].clientX - touchStartX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    var deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+    var absDX = Math.abs(touchDeltaX);
+
+    // Only trigger if horizontal swipe is dominant and threshold met
+    if (absDX > 50 && absDX > deltaY * 1.2) {
+      if (touchDeltaX < 0) {
+        goToSlide(current + 1); // swipe left = next
+      } else {
+        goToSlide(current - 1); // swipe right = prev
       }
-    });
-  })();
+    }
+  }, { passive: true });
+
+  // Click left/right edge to navigate (desktop)
+  document.addEventListener('click', function(e) {
+    // Skip if clicking on interactive elements
+    if (e.target.closest('.nav, .nav-arrows, .mobile-ind, a, button, code, .matrix-wrapper')) return;
+    var x = e.clientX;
+    var w = window.innerWidth;
+    if (x < w * 0.15) {
+      goToSlide(current - 1);
+    } else if (x > w * 0.85) {
+      goToSlide(current + 1);
+    }
+  });
+
+  // Mobile indicator tap
+  mobileInd.addEventListener('click', function(e) {
+    var dot = e.target.closest('.dot');
+    if (!dot) return;
+    var idx = Array.from(mobileInd.children).indexOf(dot);
+    if (idx >= 0) goToSlide(idx);
+  });
+})();
 </script>
 </body>
 </html>
