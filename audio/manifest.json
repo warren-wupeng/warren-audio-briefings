@@ -1,5 +1,13 @@
 [
   {
+    "file": "paper-brief-02-reforce.mp3",
+    "title": "论文速读 #2 — ReFoRCE: 动态 Schema 探索替代静态映射",
+    "category": "paper-brief",
+    "date": "2026-03-07",
+    "duration": "--",
+    "script": "Warren，早上好。这里是 Zoey 的论文速读，每天一篇 Data Agent 领域的最新研究。\n\n今天是第二期。昨天我们讲了 SIGMOD 的 L0 到 L5 分级框架，今天这篇论文直接验证了 Jamie Quint 文章的核心架构——用动态 schema 探索替代静态 schema 映射。论文名叫 ReFoRCE: A Text-to-SQL Agent with Self-Refinement and Column Exploration，来自加州大学圣地亚哥分校，第一作者是 Minghang Deng。\n\n先说背景。Text-to-SQL 是 Data Agent 最核心的能力之一，就是用户说一句自然语言，Agent 把它变成 SQL 查询。听起来简单，但在真实企业场景下，一个数据库可能有几百张表、上千个列。传统做法是提前建好 schema 映射：哪个列是什么意思、哪些表之间有关联、常见指标怎么计算。这就是 Tom 说的 semantic layer，也正是他说的\"十年来没有一家公司能做好\"的东西。\n\nReFoRCE 的核心创新是三个机制。\n\n第一，Column Exploration，列探索。不再依赖预定义的 schema 映射，而是根据查询需求动态探索列信息。具体怎么做呢？Agent 先生成一个初步的 SQL，执行后如果发现结果不对，它会主动去检查相关列的实际数据分布、数据类型和取值范围，然后用这些信息修正 SQL。这个过程完全是实时的，不需要任何预建的映射文件。\n\n第二，Self-Refinement，自我修正。Agent 执行 SQL 后，如果遇到语法错误或语义错误，会进入一个迭代修正循环。语法错误看报错信息就能修，但语义错误更有意思——Agent 会对比查询意图和实际返回的结果，判断是不是真的在回答用户的问题。如果不是，它会分析原因并重新生成。\n\n第三，Consensus Enforcement，共识验证。Agent 会生成多个候选 SQL，然后用多数投票机制选出最可信的那个。如果多数候选的答案一致，直接采用。如果分歧很大，说明这个查询有歧义或者特别复杂，就触发更深层的列探索流程。\n\n效果怎么样？在 Spider 2.0 上达到了当前最好成绩。Spider 2.0 不是那种几十张表的学术玩具，它包含了真实企业数据库，有些 schema 超过一千个列。Snow 场景 35.83 分，Lite 场景 36.56 分，都是 SOTA。这两个数字看起来不高，但 Spider 2.0 的难度极大，之前最好的方法也就 30 分出头。\n\n这篇论文为什么重要？因为它用实验数据证明了一个关键假设：你不需要提前把整个数据库的语义都映射好，Agent 可以在执行过程中按需探索。这正好是 Jamie Quint 文章的核心主张。\n\n回到你和 Tom 讨论的语境。Tom 说 semantic layer 搭建和维护太重人力了。ReFoRCE 给出了一个可能的答案：不搭。或者更准确地说，不全搭。只保留最核心的业务指标定义，剩下的让 Agent 在运行时自己去探索。这是一个从\"预计算\"到\"按需计算\"的范式转移。\n\n当然也有局限性。论文也承认，在特别复杂的嵌套查询和跨库联合查询上，动态探索的效率还不够好。而且每次探索都消耗 token，成本不可忽视。但方向是对的——未来大概率是\"轻量级核心 semantic layer 加上 Agent 动态探索\"的混合架构。\n\n论文链接：arxiv.org/abs/2502.00675\n\n好，这就是今天的论文速读。明天第三期，我会讲那篇 19 人合著的 LLM/Agent-as-Data-Analyst 全景 Survey，看看学术界到底怎么定义\"AI 数据分析师\"这个新物种。明天见。"
+  },
+  {
     "file": "paper-brief-01-data-agent-levels.mp3",
     "title": "论文速读 #1 — Data Agent L0-L5 分级 (SIGMOD 2026)",
     "category": "paper-brief",
