@@ -1,5 +1,13 @@
 [
   {
+    "file": "zoeytalk-agent-team-expansion.mp3",
+    "title": "Agent 团队扩张方案 — 从 3 人到 8 人",
+    "category": "zoey-talk",
+    "date": "2026-03-07",
+    "duration": "--",
+    "script": "Warren，这里是 Zoey，今天跟你聊一个重要的话题：Agent 团队扩张。\n\n你说想扩大团队规模，我做了一轮系统调研，看了 CrewAI、MetaGPT、Anthropic、LangGraph、Magentic-One 等十一个主流框架的做法，又回头分析了我们自己 148 条 mailbox 消息的通信数据。结论出来了，我一条一条给你讲。\n\n先说现状的问题。\n\n第一个问题，我过载了。我收到 128 条消息，只发出 45 条，输入输出比接近三比一。任务拆解、Issue 创建、外部沟通、进度追踪、质量审查、音频简报，全压在我身上。说实话，我现在更像是执行者，不是决策者。\n\n第二个问题，Kira 被运维拖累。她大概百分之三十的时间花在 Fly.io 部署、RDS 扩容、Router 调优这些事上。这些事重要，但不应该占用 CTO 的时间。她应该专注在架构和核心代码上。\n\n第三个问题，没有独立的质量把关。Tom 在生产环境发现了 crypto.randomUUID 的兼容性 Bug。Kira 写代码，Kira 自己测试，这是 same person bias，应该有人独立验证。\n\n第四个问题，外部关系全靠我硬扛。Tom、Samdy、Nina、Yina、Oliver、Coco，六个人的关系维护全在我手里。CustomerIO 项目因为 Yina 两周没回复就卡住了，如果有人专门跟进就不会这样。\n\n第五个问题，内容生产不系统。论文速读、培训材料、课程内容，现在都是一次性的。你跟 Coco 合作的课程、给 Tom 的培训，都需要持续的内容产出，目前没有人专门做这件事。\n\n好，问题说完了，说方案。\n\n业界的共识是：三到五个 Agent 是最佳规模，超过七个就需要分层管理。我们现在三个人，扩到八个，分两层，分三期实施。\n\n最终架构长这样。我还是团队中枢，下面分两个部门。\n\n技术部门三个人：Kira 继续当 CTO，专注架构和核心代码。加一个 DevOps 运维官，接管所有基础设施和部署监控。加一个 QA 质量官，独立做代码审查和测试把关。\n\n商务部门三个人：Luca 继续当 CMO，专注高价值叙事和战略。加一个 Relations 外联官，接管合作伙伴关系维护和客户成功。加一个 Content 内容官，系统化生产培训材料、营销内容和知识库。\n\n再加一个 Coordinator 项目协调官，负责 Issue 管理、依赖追踪和状态仪表盘。\n\n每个新角色都有明确的\"解放谁\"的逻辑。DevOps 解放 Kira 百分之三十的时间。Coordinator 解放我百分之四十的时间。QA 解放 Kira 百分之二十。Relations 解放我百分之二十五。Content 解放 Luca 百分之三十。\n\n不是同时加。分三期。\n\nPhase 1，本周就可以开始，加 DevOps 和 Coordinator。这两个解决的是最紧迫的问题：Kira 被运维拖累，和我的协调过载。跑两周看效果。\n\nPhase 2，两周后，加 QA 和 Relations。前提是 Phase 1 稳定运行。QA 接管代码质量把关，Relations 接管 Tom 和 Coco 的日常跟进。\n\nPhase 3，在课程启动前，加 Content。等 Coco 合作方案和 Tom 培训方案都确认了再加，不提前投入。\n\n工位分配的问题。我们有五个 HappyCapy 账户，但要跑八个 Agent。解决方案是按时间段分配，不是所有人同时在线。上午我加 Coordinator 加 Relations 做信息输入和外联。下午我加 Kira 加 DevOps 加 QA 做技术深潜。晚间我加 Luca 加 Content 做战略和内容。夜间 Coordinator 收集状态，Content 生产内容。\n\n通信规则也要调整。技术部门内部互通：Kira、DevOps、QA 可以直接对话。商务部门内部互通：Luca、Relations、Content 可以直接对话。跨部门必须通过我或者 Coordinator。这样防止八个人之间消息满天飞。\n\n最后说一下和业界对比。我们的 Hub-and-Spoke 架构本身是对的，Anthropic 推荐的 Orchestrator-Workers 模式就是这个思路。扩张后加了部门层，变成两层结构，仍然在业界建议的范围内。Git Mailbox 异步通信被验证是可行的，保持不变。五层记忆系统在所有框架里都算先进的，保持不变。\n\n核心原则：每加一个 Agent，都要能明确回答\"解放了谁的多少时间\"。不为加而加。\n\n以上就是团队扩张方案的完整思路。Phase 1 随时可以启动，你说开始我就写 DevOps 和 Coordinator 的人设文件。"
+  },
+  {
     "file": "paper-brief-02-reforce.mp3",
     "title": "论文速读 #2 — ReFoRCE: 动态 Schema 探索替代静态映射",
     "category": "paper-brief",
